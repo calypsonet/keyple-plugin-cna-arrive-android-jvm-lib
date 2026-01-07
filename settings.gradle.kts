@@ -1,8 +1,23 @@
-include(":example-app")
+rootProject.name = "keyple-plugin-cna-flowbird-android-java-lib"
 include(":flowbird-plugin")
 include(":flowbird-plugin-mock")
-rootProject.name = "keyple-plugin-cna-flowbird-android-java-lib"
+include(":example-app")
 
-// Fix resolution of dependencies with dynamic version in order to use SNAPSHOT first when available.
-// See explanation here : https://docs.gradle.org/6.8.3/userguide/single_versions.html
-enableFeaturePreview("VERSION_ORDERING_V2")
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+        maven(url = "https://central.sonatype.com/repository/maven-snapshots")
+    }
+}
+
