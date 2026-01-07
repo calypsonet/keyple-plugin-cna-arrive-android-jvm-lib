@@ -146,6 +146,7 @@ abstract class AbstractExampleActivity :
   }
 
   abstract fun initContentView()
+
   abstract fun initReaders()
 
   protected fun getSecuritySettings(): CardSecuritySetting? {
@@ -207,8 +208,7 @@ abstract class AbstractExampleActivity :
     // - two card resource profiles A and B are defined, each expecting a specific card
     // characterized by its power-on data and placed in a specific reader.
     // - the timeout for using the card's resources is set at 5 seconds.
-    cardResourceService
-        .configurator
+    cardResourceService.configurator
         .withBlockingAllocationMode(100, 10000)
         .withPlugins(
             PluginsConfigurator.builder()

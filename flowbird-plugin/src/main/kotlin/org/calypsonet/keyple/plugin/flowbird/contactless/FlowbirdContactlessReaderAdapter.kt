@@ -193,6 +193,7 @@ internal class FlowbirdContactlessReaderAdapter(context: Context) :
 
   /**
    * Configure an Alternate hunter. Alternate hunt between many hunters
+   *
    * @see AlternateHunter
    */
   @Suppress("unused")
@@ -208,6 +209,7 @@ internal class FlowbirdContactlessReaderAdapter(context: Context) :
 
   /**
    * Configure an Competition hunter. Define an object CompetitionHunter to manage many hunters
+   *
    * @see CompetitionHunter
    */
   private fun configureCompetitiveHunter() {
@@ -334,12 +336,10 @@ internal class FlowbirdContactlessReaderAdapter(context: Context) :
     channelResponseApdu = Channel(Channel.UNLIMITED)
 
     return suspendCoroutineWithTimeout(APDU_TIMEOUT) { continuation ->
-      val handler =
-          CoroutineExceptionHandler { _, exception ->
-            Timber.e("error APDU connection : $exception")
-            handleResponseApduResult(
-                result = null, throwable = exception, continuation = continuation)
-          }
+      val handler = CoroutineExceptionHandler { _, exception ->
+        Timber.e("error APDU connection : $exception")
+        handleResponseApduResult(result = null, throwable = exception, continuation = continuation)
+      }
 
       launchApdu(apduIn = apduIn, handler = handler, continuation = continuation)
     }

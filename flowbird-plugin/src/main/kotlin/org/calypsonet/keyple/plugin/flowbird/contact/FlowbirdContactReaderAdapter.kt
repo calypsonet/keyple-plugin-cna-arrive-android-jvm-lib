@@ -73,12 +73,10 @@ internal class FlowbirdContactReaderAdapter(private val samSlot: SamSlot) :
     channelResponseApdu = Channel(Channel.UNLIMITED)
 
     return suspendCoroutineWithTimeout(APDU_TIMEOUT) { continuation ->
-      val handler =
-          CoroutineExceptionHandler { _, exception ->
-            Timber.e("error SAM connection : $exception")
-            handleResponseApduResult(
-                result = null, throwable = exception, continuation = continuation)
-          }
+      val handler = CoroutineExceptionHandler { _, exception ->
+        Timber.e("error SAM connection : $exception")
+        handleResponseApduResult(result = null, throwable = exception, continuation = continuation)
+      }
 
       launchApdu(apduIn = apduIn, handler = handler, continuation = continuation)
     }

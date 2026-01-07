@@ -44,6 +44,7 @@ internal class FlowbirdReader {
 
   /**
    * Send data to the presented media (phone, card)
+   *
    * @param command The command to send
    */
   fun sendCommandToCard(
@@ -80,6 +81,7 @@ internal class FlowbirdReader {
 
   /**
    * Send data to the presented media (phone, card)
+   *
    * @param command The command to send
    */
   @Suppress("EXPERIMENTAL_API_USAGE")

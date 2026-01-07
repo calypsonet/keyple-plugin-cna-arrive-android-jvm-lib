@@ -32,6 +32,7 @@ class MyHuntEventListener : HuntEventListener.Stub() {
   private var id = javaClass::class.java.simpleName
 
   var usePeripheralResult = false
+
   fun add(hunt: HuntInterface) {
     try {
       hunt.addEventListener(this)
