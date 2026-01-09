@@ -15,14 +15,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.os.RemoteException
-import com.parkeon.app.ui.UiManager
 import com.parkeon.content.BindJoiner
 import com.parkeon.data.StateHelper
-import com.parkeon.periphs.display.TextDisplay
 import com.parkeon.periphs.reader.IApduReader
 import com.parkeon.periphs.reader.IApduReaderExchangeListener
-import com.parkeon.sound.SoundManager
-import com.parkeon.system.LedInterface
 import java.lang.ref.WeakReference
 import java.util.HashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -39,7 +35,6 @@ import timber.log.Timber
 internal class FlowbirdReader {
 
   var readerInstance: IApduReader? = null
-  private var uiManager: UiManager? = null
 
   /**
    * Send data to the presented media (phone, card)
@@ -118,39 +113,18 @@ internal class FlowbirdReader {
     }
   }
 
-  fun displayHuntingNone() {
-    updateUi(SITUATION_HUNTING_NONE)
-  }
-
-  internal fun updateUi(situation: String) {
-    uiManager?.functionalSituation = situation
-    uiManager?.executeMedia(DOMAIN, "fr")
-  }
-
   fun getService(name: String?): IBinder? {
     return joiner?.getService(name)
-  }
-
-  fun reloadUiManager() {
-    if (uiManager != null) {
-      uiManager!!.loadDefaultMediaDir()
-      uiManager!!.loadDefaultSituationDir()
-    } else {
-      Timber.e("UiManager not initialized")
-    }
   }
 
   companion object {
 
     private const val INIT_TIMEOUT = 2000L
 
-    private const val DOMAIN = "KeypleFlowbirdDomain"
     private const val SAM_1_ATR_KEY = "/contactless/sam1/atr"
     private const val SAM_2_ATR_KEY = "/contactless/sam2/atr"
     private const val SAM_3_ATR_KEY = "/contactless/sam3/atr"
     private const val SAM_4_ATR_KEY = "/contactless/sam4/atr"
-
-    private const val SITUATION_HUNTING_NONE = "customer.media.hunting.none"
 
     private const val LED_PATTERNS_TYPE_ALL = "all/all"
 
@@ -176,13 +150,9 @@ internal class FlowbirdReader {
       Timber.d("Clear Flowbird Reader instance")
       joiner!!.unbind()
       getInstance().let {
-        it.displayHuntingNone()
-
         it.readerInstance = null
         uniqueInstance = WeakReference(null)
         isInitied.set(false)
-
-        it.uiManager = null
       }
     }
 
@@ -213,7 +183,7 @@ internal class FlowbirdReader {
                     object : BindJoiner.Listener {
                       override fun onJoined(initDone: Boolean) {
                         Timber.i("Got all services.")
-                        onCreateDone(initDone, context)
+                        onCreateDone(initDone)
 
                         continuation.resume(true)
                       }
@@ -254,7 +224,7 @@ internal class FlowbirdReader {
       return services
     }
 
-    private fun onCreateDone(initDone: Boolean, context: Context) {
+    private fun onCreateDone(initDone: Boolean) {
       val reader = IApduReader.Stub.asInterface(joiner!!.getService(READER_CLESS))
 
       uniqueInstance = WeakReference(FlowbirdReader())
@@ -262,41 +232,11 @@ internal class FlowbirdReader {
 
       isInitied.set(true)
 
-      loadResources(context)
-
       if (initDone) {
         Timber.i("All services bound")
       } else {
         Timber.i("Fail to bind all services")
       }
-    }
-
-    private fun loadResources(context: Context) {
-      val ledInterface = LedInterface.Stub.asInterface(uniqueInstance.get()?.getService("leds"))
-
-      if (ledInterface == null) {
-        Timber.e("Fail to join the 'leds' interface")
-      }
-
-      val soundInterface = SoundManager.Stub.asInterface(uniqueInstance.get()?.getService("sound"))
-      if (soundInterface == null) {
-        Timber.e("Fail to join the 'sound' interface")
-      }
-
-      val textInterface =
-          TextDisplay.Stub.asInterface(uniqueInstance.get()?.getService("textDisplay"))
-      if (textInterface == null) {
-        Timber.e("Fail to join the 'text display' interface")
-      }
-
-      val uiManager = UiManager(context, ledInterface, soundInterface, textInterface)
-      uniqueInstance.get()!!.uiManager = uiManager
-      val crossCheck = uiManager.crossCheck(DOMAIN, "en", true, true)
-      if (!crossCheck) {
-        Timber.e("Events and translations/sounds configuration has failed!")
-      }
-
-      uniqueInstance.get()!!.reloadUiManager()
     }
   }
 }
