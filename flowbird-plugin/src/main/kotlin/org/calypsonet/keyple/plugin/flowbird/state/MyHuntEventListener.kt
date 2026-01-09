@@ -134,9 +134,4 @@ class MyHuntEventListener : HuntEventListener.Stub() {
   fun setListener(listener: ((HuntEventResult<Tag>) -> Unit)?) {
     mListener = listener
   }
-
-  companion object {
-    const val HUNT_MODE_COMPETITION = "COMPETITION"
-    const val HUNT_MODE_ALTERNATE = "ALTERNATE"
-  }
 }

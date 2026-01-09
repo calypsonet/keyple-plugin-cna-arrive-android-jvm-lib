@@ -12,36 +12,12 @@
 package org.calypsonet.keyple.plugin.flowbird.utils
 
 import android.os.Looper
-import java.util.Timer
-import java.util.TimerTask
 
 /**
  * Helper class to execute runnable in background. Thread Useful to call AsyncTask from background
  * (or unknown) thread.
  */
 class BackgroundThreadExecutor {
-  constructor(command: Runnable) {
-    if (!isUiThread) {
-      command.run()
-    } else {
-      Thread(command).start()
-    }
-  }
-
-  constructor(command: Runnable, latency: Int) {
-    Timer()
-        .schedule(
-            object : TimerTask() {
-              override fun run() {
-                if (!isUiThread) {
-                  command.run()
-                } else {
-                  Thread(command).start()
-                }
-              }
-            },
-            latency.toLong())
-  }
 
   companion object {
     val isUiThread: Boolean

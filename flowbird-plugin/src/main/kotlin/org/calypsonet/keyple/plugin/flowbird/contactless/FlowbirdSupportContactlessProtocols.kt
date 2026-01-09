@@ -11,7 +11,7 @@
  ************************************************************************************** */
 package org.calypsonet.keyple.plugin.flowbird.contactless
 
-enum class FlowbirdSupportContactlessProtocols constructor(val key: String) {
+enum class FlowbirdSupportContactlessProtocols(val key: String) {
   ALL("ALL"),
   A("A"),
   B("B");

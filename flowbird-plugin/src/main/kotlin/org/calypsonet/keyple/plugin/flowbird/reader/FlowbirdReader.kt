@@ -122,18 +122,6 @@ internal class FlowbirdReader {
     updateUi(SITUATION_HUNTING_NONE)
   }
 
-  fun displayWaiting() {
-    updateUi(SITUATION_WAITING)
-  }
-
-  fun displayResultSuccess() {
-    updateUi(SITUATION_SUCCESS)
-  }
-
-  fun displayResultFailed() {
-    updateUi(SITUATION_FAILED)
-  }
-
   internal fun updateUi(situation: String) {
     uiManager?.functionalSituation = situation
     uiManager?.executeMedia(DOMAIN, "fr")
@@ -162,9 +150,6 @@ internal class FlowbirdReader {
     private const val SAM_3_ATR_KEY = "/contactless/sam3/atr"
     private const val SAM_4_ATR_KEY = "/contactless/sam4/atr"
 
-    private const val SITUATION_SUCCESS = "customer.media.validation.cless.granted"
-    private const val SITUATION_FAILED = "customer.media.validation.cless.denied"
-    private const val SITUATION_WAITING = "customer.media.hunting.all"
     private const val SITUATION_HUNTING_NONE = "customer.media.hunting.none"
 
     private const val LED_PATTERNS_TYPE_ALL = "all/all"
