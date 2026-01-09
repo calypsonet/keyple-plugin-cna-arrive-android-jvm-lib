@@ -35,7 +35,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.calypsonet.keyple.plugin.flowbird.Constants.HUNTER_NAME
-import org.calypsonet.keyple.plugin.flowbird.FlowbirdUiManager
 import org.calypsonet.keyple.plugin.flowbird.reader.CardRemoved
 import org.calypsonet.keyple.plugin.flowbird.reader.FlowbirdReader
 import org.calypsonet.keyple.plugin.flowbird.reader.HuntEventResult
@@ -258,7 +257,6 @@ internal class FlowbirdContactlessReaderAdapter(context: Context) :
   /** Method called when the card detection is started by the Keyple Plugin */
   override fun onStartDetection() {
     startHunt()
-    FlowbirdUiManager.displayWaiting()
   }
 
   /** Method called when the card detection is stopped by the Keyple Plugin */
