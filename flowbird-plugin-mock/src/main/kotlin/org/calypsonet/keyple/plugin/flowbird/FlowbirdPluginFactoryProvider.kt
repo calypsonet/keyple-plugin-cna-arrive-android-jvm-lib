@@ -14,12 +14,7 @@ package org.calypsonet.keyple.plugin.flowbird
 import android.app.Activity
 
 object FlowbirdPluginFactoryProvider {
-  suspend fun getFactory(
-      activity: Activity,
-      mediaFiles: List<String>,
-      situationFiles: List<String>,
-      translationFiles: List<String>
-  ): FlowbirdPluginFactory {
+  suspend fun getFactory(activity: Activity): FlowbirdPluginFactory {
     throw UnsupportedOperationException("Mocked plugin!")
   }
 }

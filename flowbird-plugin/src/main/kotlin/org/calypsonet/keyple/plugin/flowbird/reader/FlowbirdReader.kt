@@ -31,7 +31,6 @@ import kotlinx.coroutines.channels.Channel
 import org.calypsonet.keyple.plugin.flowbird.Constants.HUNTER_NAME
 import org.calypsonet.keyple.plugin.flowbird.Constants.READER_CLESS
 import org.calypsonet.keyple.plugin.flowbird.contact.SamSlot
-import org.calypsonet.keyple.plugin.flowbird.utils.FileUtils
 import org.calypsonet.keyple.plugin.flowbird.utils.suspendCoroutineWithTimeout
 import org.eclipse.keyple.core.plugin.ReaderIOException
 import org.eclipse.keyple.core.util.HexUtil
@@ -67,9 +66,9 @@ internal class FlowbirdReader {
 
               channelResponseApdu?.let {
                 if (responses.isNotEmpty()) {
-                  it.offer(responses[0] as ByteArray?)
+                  it.trySend(responses[0] as ByteArray?).isSuccess
                 } else {
-                  it.offer(ByteArray(0))
+                  it.trySend(ByteArray(0)).isSuccess
                 }
               }
             }
@@ -107,9 +106,9 @@ internal class FlowbirdReader {
 
               channelResponseApdu?.let {
                 if (responses.isNotEmpty()) {
-                  it.offer(responses[0] as ByteArray?)
+                  it.trySend(responses[0] as ByteArray?).isSuccess
                 } else {
-                  it.offer(ByteArray(0))
+                  it.trySend(ByteArray(0)).isSuccess
                 }
               }
             }
@@ -203,12 +202,7 @@ internal class FlowbirdReader {
     }
 
     @Suppress("EXPERIMENTAL_API_USAGE")
-    suspend fun initReader(
-        context: Context,
-        mediaFiles: List<String>,
-        situationFiles: List<String>,
-        translationFiles: List<String>
-    ): Boolean {
+    suspend fun initReader(context: Context): Boolean {
       Timber.d("Init Flowbird Reader instance")
 
       var atrString = StateHelper(context).getAsString(SAM_1_ATR_KEY)
@@ -224,12 +218,6 @@ internal class FlowbirdReader {
       atrContainer[SamSlot.FOUR] = HexUtil.toByteArray(atrString)
 
       val services = getServices()
-
-      FileUtils.deployResourcesFiles(
-          context = context,
-          mediaFiles = mediaFiles,
-          situationFiles = situationFiles,
-          translationFiles = translationFiles)
 
       val isInitDone: Boolean? =
           suspendCoroutineWithTimeout(INIT_TIMEOUT) { continuation ->

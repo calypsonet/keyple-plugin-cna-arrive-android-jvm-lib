@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2025 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -9,7 +9,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.calypsonet.keyple.plugin.flowbird.example.util
+package org.calypsonet.keyple.plugin.flowbird.example
 
 /**
  * Helper class to provide specific elements to handle Calypso cards.
@@ -21,21 +21,18 @@ package org.calypsonet.keyple.plugin.flowbird.example.util
  * * Contract List
  * * Contracts
  */
-object CalypsoClassicInfo {
-  /** Calypso default AID */
-  //    const val AID = "315449432e494341"
-  const val AID = "315449432e49434131"
-  //    const val AID = "A0000004040125090101"
-  //    const val AID_HIS_STRUCTURE_5H = "315449432e49434131"
+object CalypsoConstants {
+  /** AID: Keyple test kit profile 1, Application 2 */
+  const val AID = "315449432E"
 
   // / ** 1TIC.ICA AID */
   // public final static String AID = "315449432E494341";
   /** SAM C1 regular expression: platform, version and serial number values are ignored */
   const val ATR_REV1_REGEX = "3B8F8001805A0A0103200311........829000.."
-  const val RECORD_NUMBER_1: Byte = 1
-  const val RECORD_NUMBER_2: Byte = 2
-  const val RECORD_NUMBER_3: Byte = 3
-  const val RECORD_NUMBER_4: Byte = 4
+  const val RECORD_NUMBER_1 = 1
+  const val RECORD_NUMBER_2 = 2
+  const val RECORD_NUMBER_3 = 3
+  const val RECORD_NUMBER_4 = 4
   const val SFI_EnvironmentAndHolder = 0x07.toByte()
   const val SFI_EventLog = 0x08.toByte()
   const val SFI_ContractList = 0x1E.toByte()
@@ -48,5 +45,5 @@ object CalypsoClassicInfo {
   // Security settings
   const val SAM_PROFILE_NAME = "SAM C1"
 
-  const val SAM_READER_NAME_REGEX = ".*ContactReader_0"
+  const val SAM_READER_NAME_REGEX = ".*ContactReader"
 }

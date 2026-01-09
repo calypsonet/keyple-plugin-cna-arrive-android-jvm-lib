@@ -14,18 +14,9 @@ package org.calypsonet.keyple.plugin.flowbird
 import android.app.Activity
 
 object FlowbirdPluginFactoryProvider {
-  suspend fun getFactory(
-      activity: Activity,
-      mediaFiles: List<String>,
-      situationFiles: List<String>,
-      translationFiles: List<String>
-  ): FlowbirdPluginFactory {
+  suspend fun getFactory(activity: Activity): FlowbirdPluginFactory {
     val pluginFactory = FlowbirdPluginFactoryAdapter()
-    pluginFactory.init(
-        activity = activity,
-        mediaFiles = mediaFiles,
-        situationFiles = situationFiles,
-        translationFiles = translationFiles)
+    pluginFactory.init(activity = activity)
 
     return pluginFactory
   }

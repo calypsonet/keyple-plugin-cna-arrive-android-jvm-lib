@@ -25,18 +25,8 @@ internal class FlowbirdPluginFactoryAdapter internal constructor() :
   private lateinit var pluginAdapter: FlowbirdPluginAdapter
 
   @Throws(ReaderIOException::class)
-  suspend fun init(
-      activity: Activity,
-      mediaFiles: List<String>,
-      situationFiles: List<String>,
-      translationFiles: List<String>
-  ): FlowbirdPluginFactoryAdapter {
-    val started =
-        FlowbirdReader.initReader(
-            context = activity,
-            mediaFiles = mediaFiles,
-            situationFiles = situationFiles,
-            translationFiles = translationFiles)
+  suspend fun init(activity: Activity): FlowbirdPluginFactoryAdapter {
+    val started = FlowbirdReader.initReader(context = activity)
 
     this.pluginAdapter = FlowbirdPluginAdapter(activity)
 
