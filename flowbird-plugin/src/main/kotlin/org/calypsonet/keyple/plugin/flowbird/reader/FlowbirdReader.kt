@@ -126,8 +126,6 @@ internal class FlowbirdReader {
     private const val SAM_3_ATR_KEY = "/contactless/sam3/atr"
     private const val SAM_4_ATR_KEY = "/contactless/sam4/atr"
 
-    private const val LED_PATTERNS_TYPE_ALL = "all/all"
-
     @Suppress("EXPERIMENTAL_API_USAGE") val atrContainer = HashMap<SamSlot, ByteArray?>()
 
     private var joiner: BindJoiner? = null
@@ -203,23 +201,14 @@ internal class FlowbirdReader {
       // Get needed services
       val services: MutableMap<String, Intent> = HashMap()
 
-      val ledPatterns = Intent(com.parkeon.content.Intent.ACTION_LEDS_PATTERN)
-      ledPatterns.type = LED_PATTERNS_TYPE_ALL
-      services["led_patterns"] = ledPatterns
-      val ledIntent = Intent(com.parkeon.content.Intent.ACTION_LEDS)
-      ledIntent.type = LED_PATTERNS_TYPE_ALL
-      services["leds"] = ledIntent
-
-      val authentication = Intent(com.parkeon.content.Intent.ACTION_AUTHENTICATION_SERVICE)
-      authentication.type = "agent/maintenance"
-      services["authentication"] = authentication
-      services["sound"] = Intent(com.parkeon.content.Intent.ACTION_SOUND_SERVICE)
-
-      val intentReader = Intent("com.parkeon.services.card.apdu")
-      services[READER_CLESS] = intentReader
+      // HUNT
       val cardIntent = Intent(com.parkeon.content.Intent.ACTION_HUNT)
       cardIntent.type = "hunt/card"
       services[HUNTER_NAME] = cardIntent
+
+      // APDU
+      val intentReader = Intent("com.parkeon.services.card.apdu")
+      services[READER_CLESS] = intentReader
 
       return services
     }
