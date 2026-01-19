@@ -9,7 +9,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.calypsonet.keyple.plugin.flowbird.example
+package org.calypsonet.keyple.example.plugin.arrive
 
 /**
  * Helper class to provide specific elements to handle Calypso cards.

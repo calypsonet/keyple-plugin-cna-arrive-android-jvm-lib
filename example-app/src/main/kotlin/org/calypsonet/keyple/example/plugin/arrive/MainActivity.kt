@@ -9,7 +9,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.calypsonet.keyple.plugin.flowbird.example
+package org.calypsonet.keyple.example.plugin.arrive
 
 import android.os.Bundle
 import android.view.WindowManager
@@ -24,12 +24,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.calypsonet.keyple.example.plugin.arrive.MessageDisplayAdapter.Message
+import org.calypsonet.keyple.example.plugin.arrive.MessageDisplayAdapter.MessageType
+import org.calypsonet.keyple.example.plugin.arrive.databinding.ActivityMainBinding
 import org.calypsonet.keyple.plugin.arrive.ArriveConstants
 import org.calypsonet.keyple.plugin.arrive.ArriveContactlessProtocols
 import org.calypsonet.keyple.plugin.arrive.ArrivePluginFactoryProvider
-import org.calypsonet.keyple.plugin.flowbird.example.MessageDisplayAdapter.Message
-import org.calypsonet.keyple.plugin.flowbird.example.MessageDisplayAdapter.MessageType
-import org.calypsonet.keyple.plugin.flowbird.example.databinding.ActivityMainBinding
 import org.eclipse.keyple.card.calypso.CalypsoExtensionService
 import org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamExtensionService
 import org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamUtil
@@ -124,7 +124,7 @@ class MainActivity :
 
     setSupportActionBar(binding.toolbar)
     supportActionBar?.title = getString(R.string.app_name)
-    supportActionBar?.subtitle = "Flowbird Plugin"
+    supportActionBar?.subtitle = "Arrive Plugin"
 
     messageDisplayAdapter = MessageDisplayAdapter(messages)
     binding.messageRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -182,7 +182,7 @@ class MainActivity :
   }
 
   private fun finalizeInitialization() {
-    // Connexion to Flowbird lib take time, we've added a callback to this factory.
+    // Connexion to Arrive lib take time, we've added a callback to this factory.
     GlobalScope.launch {
       try {
         initReaders()
