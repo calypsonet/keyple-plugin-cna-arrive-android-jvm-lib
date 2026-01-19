@@ -11,39 +11,22 @@
  ************************************************************************************** */
 package org.calypsonet.keyple.example.plugin.arrive
 
-/**
- * Helper class to provide specific elements to handle Calypso cards.
- * * AID application selection (default Calypso AID)
- * * SAM_C1_ATR_REGEX regular expression matching the expected C1 SAM ATR
- * * Files infos (SFI, rec number, etc) for
- * * Environment and Holder
- * * Event Log
- * * Contract List
- * * Contracts
- */
+/** Helper class to provide specific elements to handle Calypso cards. */
 object CalypsoConstants {
+
   /** AID: Keyple test kit profile 1, Application 2 */
   const val AID = "315449432E"
 
-  // / ** 1TIC.ICA AID */
-  // public final static String AID = "315449432E494341";
-  /** SAM C1 regular expression: platform, version and serial number values are ignored */
-  const val ATR_REV1_REGEX = "3B8F8001805A0A0103200311........829000.."
-  const val RECORD_NUMBER_1 = 1
-  const val RECORD_NUMBER_2 = 2
-  const val RECORD_NUMBER_3 = 3
-  const val RECORD_NUMBER_4 = 4
-  const val SFI_EnvironmentAndHolder = 0x07.toByte()
-  const val SFI_EventLog = 0x08.toByte()
-  const val SFI_ContractList = 0x1E.toByte()
-  const val SFI_Contracts = 0x09.toByte()
-  const val SFI_Counter1 = 0x19.toByte()
-  const val eventLog_dataFill = "00112233445566778899AABBCCDDEEFF00112233445566778899AABBCC"
+  const val REC_SIZE = 29
 
-  const val RECORD_SIZE = 29
+  const val SFI_ENV_HOLDER = 0x07.toByte()
+  const val SFI_EVENT_LOG = 0x08.toByte()
+  const val SFI_CONTRACTS_LIST = 0x1E.toByte()
+  const val SFI_CONTRACTS = 0x09.toByte()
+  const val SFI_ALL_COUNTERS = 0x19.toByte()
 
-  // Security settings
-  const val SAM_PROFILE_NAME = "SAM C1"
-
-  const val SAM_READER_NAME_REGEX = ".*ContactReader"
+  const val REC_1 = 1
+  const val REC_2 = 2
+  const val REC_3 = 3
+  const val REC_4 = 4
 }

@@ -40,7 +40,6 @@ import org.eclipse.keypop.calypso.card.WriteAccessLevel.DEBIT
 import org.eclipse.keypop.calypso.card.WriteAccessLevel.LOAD
 import org.eclipse.keypop.calypso.card.WriteAccessLevel.PERSONALIZATION
 import org.eclipse.keypop.calypso.card.card.CalypsoCard
-import org.eclipse.keypop.calypso.card.transaction.ChannelControl.CLOSE_AFTER
 import org.eclipse.keypop.calypso.card.transaction.SecureRegularModeTransactionManager
 import org.eclipse.keypop.calypso.card.transaction.SymmetricCryptoSecuritySetting
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam
@@ -182,7 +181,7 @@ class MainActivity :
   }
 
   private fun finalizeInitialization() {
-    // Connexion to Arrive lib take time, we've added a callback to this factory.
+    // Connexion to Arrive lib takes time, we've added a callback to this factory.
     GlobalScope.launch {
       try {
         initReaders()
@@ -340,25 +339,24 @@ class MainActivity :
       (cardTransactionManager as SecureRegularModeTransactionManager)
           .prepareOpenSecureSession(LOAD)
           .prepareReadRecords(
-              CalypsoConstants.SFI_EnvironmentAndHolder,
-              CalypsoConstants.RECORD_NUMBER_1,
-              CalypsoConstants.RECORD_NUMBER_1,
-              CalypsoConstants.RECORD_SIZE)
+              CalypsoConstants.SFI_ENV_HOLDER,
+              CalypsoConstants.REC_1,
+              CalypsoConstants.REC_1,
+              CalypsoConstants.REC_SIZE)
           .prepareReadRecords(
-              CalypsoConstants.SFI_EventLog,
-              CalypsoConstants.RECORD_NUMBER_1,
-              CalypsoConstants.RECORD_NUMBER_1,
-              CalypsoConstants.RECORD_SIZE)
+              CalypsoConstants.SFI_EVENT_LOG,
+              CalypsoConstants.REC_1,
+              CalypsoConstants.REC_1,
+              CalypsoConstants.REC_SIZE)
           .prepareCloseSecureSession()
-          .processCommands(CLOSE_AFTER)
+          .processCommands(ChannelControl.CLOSE_AFTER)
     }
 
     val efEnvironmentHolder =
-        HexUtil.toHex(
-            calypsoCard.getFileBySfi(CalypsoConstants.SFI_EnvironmentAndHolder).data.content)
+        HexUtil.toHex(calypsoCard.getFileBySfi(CalypsoConstants.SFI_ENV_HOLDER).data.content)
 
     val eventLog =
-        HexUtil.toHex(calypsoCard.getFileBySfi(CalypsoConstants.SFI_EventLog).data.content)
+        HexUtil.toHex(calypsoCard.getFileBySfi(CalypsoConstants.SFI_EVENT_LOG).data.content)
 
     addMessage(
         MessageType.RESULT,
