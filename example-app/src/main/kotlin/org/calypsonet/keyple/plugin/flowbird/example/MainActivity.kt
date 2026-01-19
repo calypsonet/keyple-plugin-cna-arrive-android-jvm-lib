@@ -9,8 +9,6 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-@file:Suppress("UNNECESSARY_SAFE_CALL")
-
 package org.calypsonet.keyple.plugin.flowbird.example
 
 import android.os.Bundle
@@ -26,11 +24,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.calypsonet.keyple.plugin.flowbird.*
-import org.calypsonet.keyple.plugin.flowbird.contact.FlowbirdContactReader
-import org.calypsonet.keyple.plugin.flowbird.contact.SamSlot
-import org.calypsonet.keyple.plugin.flowbird.contactless.FlowbirdContactlessReader
-import org.calypsonet.keyple.plugin.flowbird.contactless.FlowbirdSupportContactlessProtocols
+import org.calypsonet.keyple.plugin.arrive.ArriveConstants
+import org.calypsonet.keyple.plugin.arrive.ArriveContactlessProtocols
+import org.calypsonet.keyple.plugin.arrive.ArrivePluginFactoryProvider
 import org.calypsonet.keyple.plugin.flowbird.example.MessageDisplayAdapter.Message
 import org.calypsonet.keyple.plugin.flowbird.example.MessageDisplayAdapter.MessageType
 import org.calypsonet.keyple.plugin.flowbird.example.databinding.ActivityMainBinding
@@ -73,8 +69,6 @@ class MainActivity :
 
   companion object {
     const val ISO_14443_4_LOGICAL_PROTOCOL = "ISO_14443_4"
-    const val MIFARE_ULTRALIGHT_LOGICAL_PROTOCOL = "MIFARE_ULTRALIGHT"
-    const val ST25_SRT512_LOGICAL_PROTOCOL = "ST25_SRT512"
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -212,31 +206,29 @@ class MainActivity :
     try {
       pluginFactory =
           withContext(Dispatchers.IO) {
-            FlowbirdPluginFactoryProvider.getFactory(activity = this@MainActivity)
+            ArrivePluginFactoryProvider.provideFactory(context = this@MainActivity)
           }
     } catch (e: Exception) {
       showAlertDialogWithAction(
           "Plugin Registration Error",
-          "Unable to get get plugin factory",
+          "Unable to retrieve plugin factory",
           onOkClick = { finishAffinity() })
       return
     }
 
-    val flowbirdPlugin = SmartCardServiceProvider.getService().registerPlugin(pluginFactory)
+    val arrivePlugin = SmartCardServiceProvider.getService().registerPlugin(pluginFactory)
 
     // init card reader
-    cardReader =
-        flowbirdPlugin.getReader(FlowbirdContactlessReader.READER_NAME) as ObservableCardReader
+    cardReader = arrivePlugin.getReader(ArriveConstants.CARD_READER_NAME) as ObservableCardReader
 
     cardReader.setReaderObservationExceptionHandler(this)
     cardReader.addObserver(this)
 
     (cardReader as ConfigurableCardReader).activateProtocol(
-        FlowbirdSupportContactlessProtocols.ALL.key, FlowbirdSupportContactlessProtocols.ALL.key)
+        ArriveContactlessProtocols.ISO_14443_4_AB.name, ISO_14443_4_LOGICAL_PROTOCOL)
 
     // init SAM reader
-    samReader =
-        flowbirdPlugin.getReader("${FlowbirdContactReader.READER_NAME}_${(SamSlot.ONE.slotId)}")
+    samReader = arrivePlugin.getReader(ArriveConstants.SAM.SAM_1.readerName)
 
     Timber.i("Readers initialized")
   }
@@ -317,8 +309,7 @@ class MainActivity :
       val selectionsResult =
           cardSelectionManager.parseScheduledCardSelectionsResponse(
               cardReaderEvent.scheduledCardSelectionsResponse)
-      val card = selectionsResult.activeSmartCard
-      when (card) {
+      when (val card = selectionsResult.activeSmartCard) {
         is CalypsoCard -> {
           handleCalypsoCard(card)
         }

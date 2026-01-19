@@ -20,7 +20,6 @@ import com.parkeon.data.StateHelper
 import com.parkeon.periphs.reader.IApduReader
 import com.parkeon.periphs.reader.IApduReaderExchangeListener
 import java.lang.ref.WeakReference
-import java.util.HashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlinx.coroutines.channels.Channel
@@ -207,7 +206,8 @@ internal class FlowbirdReader {
       services[HUNTER_NAME] = cardIntent
 
       // APDU
-      val intentReader = Intent("com.parkeon.services.card.apdu")
+      val intentReader = Intent(com.parkeon.content.Intent.ACTION_APDU_EXCHANGE)
+      intentReader.type = com.parkeon.content.Intent.TYPE_APDU_READER_CONTACTLESS
       services[READER_CLESS] = intentReader
 
       return services

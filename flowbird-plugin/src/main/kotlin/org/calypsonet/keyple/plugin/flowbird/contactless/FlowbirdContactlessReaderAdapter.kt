@@ -191,22 +191,6 @@ internal class FlowbirdContactlessReaderAdapter(context: Context) :
   }
 
   /**
-   * Configure an Alternate hunter. Alternate hunt between many hunters
-   *
-   * @see AlternateHunter
-   */
-  @Suppress("unused")
-  private fun configureAlternateHunter() {
-    val realHunter = hunter as AlternateHunter
-    realHunter.reset()
-    realHunter.addHunter(
-        HUNTER_NAME,
-        HuntInterface.Stub.asInterface(flowbirdReader.getService(HUNTER_NAME)),
-        ALTERNATE_DURATION)
-    Timber.i("Configured alternate hunter: $realHunter")
-  }
-
-  /**
    * Configure an Competition hunter. Define an object CompetitionHunter to manage many hunters
    *
    * @see CompetitionHunter
