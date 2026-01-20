@@ -20,22 +20,20 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
-import org.calypsonet.keyple.plugin.arrive.ArriveConstants.TAG
-import org.calypsonet.keyple.plugin.arrive.spi.Logger
 import org.eclipse.keyple.core.common.CommonApiProperties
 import org.eclipse.keyple.core.plugin.PluginApiProperties
 import org.eclipse.keyple.core.plugin.spi.PluginFactorySpi
 import org.eclipse.keyple.core.plugin.spi.PluginSpi
+import org.eclipse.keyple.core.util.logging.LoggerFactory
 
-internal class ArrivePluginFactoryAdapter(
-    private val context: Context,
-    private val logger: Logger
-) : ArrivePluginFactory, PluginFactorySpi {
+internal class ArrivePluginFactoryAdapter(private val context: Context) :
+    ArrivePluginFactory, PluginFactorySpi {
 
   private companion object {
-    const val HUNT_INTENT_NAME = "cards"
-    const val HUNT_INTENT_TYPE = "hunt/card"
-    const val APDU_INTENT_NAME = "reader_cless"
+    private val logger = LoggerFactory.getLogger(ArrivePluginFactoryAdapter::class.java)
+    private const val HUNT_INTENT_NAME = "cards"
+    private const val HUNT_INTENT_TYPE = "hunt/card"
+    private const val APDU_INTENT_NAME = "reader_cless"
   }
 
   private var bindJoiner: BindJoiner? = null
@@ -45,18 +43,18 @@ internal class ArrivePluginFactoryAdapter(
   override fun getPluginName(): String = ArriveConstants.PLUGIN_NAME
 
   override fun getPlugin(): PluginSpi =
-      ArrivePluginAdapter(context, logger, bindJoiner!!, huntInterface!!, iApduReader!!)
+      ArrivePluginAdapter(context, bindJoiner!!, huntInterface!!, iApduReader!!)
 
   override fun getCommonApiVersion(): String = CommonApiProperties.VERSION
 
   override fun getPluginApiVersion(): String = PluginApiProperties.VERSION
 
   internal suspend fun init(): ArrivePluginFactoryAdapter {
-    logger.info(TAG, "Binding to Arrive services...")
+    logger.info("Binding to Arrive services...")
     bindJoiner = suspendBindJoinerInitialization(context, initIntents())
     huntInterface = HuntInterface.Stub.asInterface(bindJoiner!!.getService(HUNT_INTENT_NAME))
     iApduReader = IApduReader.Stub.asInterface(bindJoiner!!.getService(APDU_INTENT_NAME))
-    logger.info(TAG, "Arrive services bound")
+    logger.info("Arrive services bound")
     return this
   }
 
@@ -86,15 +84,14 @@ internal class ArrivePluginFactoryAdapter(
 
                 override fun onJoined(initDone: Boolean) {
                   if (!cont.isActive) {
-                    logger.error(
-                        TAG, "Arrive services connection established but coroutine cancelled")
+                    logger.error("Arrive services connection established but coroutine cancelled")
                     return
                   }
                   if (initDone) {
-                    logger.info(TAG, "Arrive services connection established")
+                    logger.info("Arrive services connection established")
                     cont.resume(bindJoiner)
                   } else {
-                    logger.error(TAG, "Arrive services connection established but init not done")
+                    logger.error("Arrive services connection established but init not done")
                     cont.resumeWithException(
                         IllegalStateException("BindJoiner joined but init not done"))
                   }
@@ -102,20 +99,20 @@ internal class ArrivePluginFactoryAdapter(
 
                 override fun onBindLost(intent: Intent) {
                   if (!cont.isActive) {
-                    logger.error(TAG, "Arrive services connection lost and coroutine cancelled")
+                    logger.error("Arrive services connection lost and coroutine cancelled")
                     return
                   }
-                  logger.error(TAG, "Arrive services connection lost")
+                  logger.error("Arrive services connection lost")
                   cont.resumeWithException(IllegalStateException("Bind lost for intent: $intent"))
                 }
               }
 
-          logger.info(TAG, "Waiting at most 5 seconds for Arrive services connection...")
+          logger.info("Waiting at most 5 seconds for Arrive services connection...")
           bindJoiner = BindJoiner(context, intents, listener)
           bindJoiner.bind()
 
           cont.invokeOnCancellation {
-            logger.error(TAG, "Unbinding from Arrive services on cancellation...")
+            logger.error("Unbinding from Arrive services on cancellation...")
             bindJoiner.unbind()
           }
         }

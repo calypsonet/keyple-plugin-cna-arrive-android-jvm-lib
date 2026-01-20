@@ -21,25 +21,27 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
-import org.calypsonet.keyple.plugin.arrive.ArriveConstants.TAG
 import org.calypsonet.keyple.plugin.arrive.ArriveUtils.checkNotOnMainThread
-import org.calypsonet.keyple.plugin.arrive.spi.Logger
 import org.eclipse.keyple.core.plugin.CardIOException
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi
+import org.eclipse.keyple.core.util.logging.LoggerFactory
 
 internal class ArriveSamReaderAdapter(
     private val sam: ArriveConstants.SAM,
     private val samAtrHex: String,
-    private val logger: Logger,
     private val iApduReader: IApduReader
 ) : ArriveSamReader, ReaderSpi {
+
+  private companion object {
+    private val logger = LoggerFactory.getLogger(ArriveSamReaderAdapter::class.java)
+  }
 
   private var isPhysicalChannelOpen = false
 
   override fun getName(): String = sam.readerName
 
   override fun openPhysicalChannel() {
-    logger.info(TAG, "Opening SAM channel: [ATR=${samAtrHex}]")
+    logger.info("Opening SAM channel: [ATR=${samAtrHex}]")
     isPhysicalChannelOpen = true
   }
 

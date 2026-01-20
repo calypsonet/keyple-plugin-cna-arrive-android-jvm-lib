@@ -28,6 +28,6 @@ object ArrivePluginFactoryProvider {
    * @since 3.0.0
    */
   suspend fun provideFactory(context: Context): ArrivePluginFactory {
-    return ArrivePluginFactoryAdapter(context).init()
+    throw UnsupportedOperationException("Mocked plugin!")
   }
 }

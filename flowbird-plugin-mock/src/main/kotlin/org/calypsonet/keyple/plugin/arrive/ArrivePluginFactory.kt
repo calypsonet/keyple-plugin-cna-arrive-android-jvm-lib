@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2022 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2026 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -9,13 +9,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.calypsonet.keyple.plugin.flowbird.contactless
+package org.calypsonet.keyple.plugin.arrive
 
-import org.eclipse.keyple.core.common.KeypleReaderExtension
+import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory
 
-interface FlowbirdContactlessReader : KeypleReaderExtension {
-
-  companion object {
-    const val READER_NAME = "FlowbirdContactlessReader"
-  }
-}
+interface ArrivePluginFactory : KeyplePluginExtensionFactory

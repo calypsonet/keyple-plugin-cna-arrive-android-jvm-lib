@@ -11,24 +11,33 @@
  ************************************************************************************** */
 package org.calypsonet.keyple.plugin.arrive
 
-import android.util.Log
-import org.calypsonet.keyple.plugin.arrive.spi.Logger
+/**
+ * Definition of all supported contactless protocols.
+ *
+ * @since 3.0.0
+ */
+enum class ArriveContactlessProtocols(private val techValue: String) {
 
-internal object AndroidLogLogger : Logger {
+  /**
+   * ISO 14443-4 (A, B)
+   *
+   * @since 3.0.0
+   */
+  ISO_14443_4_AB("ALL"),
 
-  override fun debug(tag: String, message: String) {
-    Log.d(tag, message)
-  }
+  /**
+   * ISO 14443-4 (A)
+   *
+   * @since 3.0.0
+   */
+  ISO_14443_4_A("A"),
 
-  override fun info(tag: String, message: String) {
-    Log.i(tag, message)
-  }
+  /**
+   * ISO 14443-4 (B)
+   *
+   * @since 3.0.0
+   */
+  ISO_14443_4_B("B");
 
-  override fun warn(tag: String, message: String, throwable: Throwable?) {
-    Log.w(tag, message, throwable)
-  }
-
-  override fun error(tag: String, message: String, throwable: Throwable?) {
-    Log.e(tag, message, throwable)
-  }
+  internal fun getTechValue(): String = techValue
 }

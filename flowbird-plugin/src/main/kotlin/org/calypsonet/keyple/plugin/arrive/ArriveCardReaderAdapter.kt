@@ -26,9 +26,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
-import org.calypsonet.keyple.plugin.arrive.ArriveConstants.TAG
 import org.calypsonet.keyple.plugin.arrive.ArriveUtils.checkNotOnMainThread
-import org.calypsonet.keyple.plugin.arrive.spi.Logger
 import org.eclipse.keyple.core.plugin.CardIOException
 import org.eclipse.keyple.core.plugin.CardInsertionWaiterAsynchronousApi
 import org.eclipse.keyple.core.plugin.CardRemovalWaiterAsynchronousApi
@@ -38,10 +36,10 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterAsynchronousSpi
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterAsynchronousSpi
 import org.eclipse.keyple.core.util.json.JsonUtil
+import org.eclipse.keyple.core.util.logging.LoggerFactory
 
 internal class ArriveCardReaderAdapter(
     private val context: Context,
-    private val logger: Logger,
     private val huntInterface: HuntInterface,
     private val iApduReader: IApduReader
 ) :
@@ -52,6 +50,7 @@ internal class ArriveCardReaderAdapter(
     CardRemovalWaiterAsynchronousSpi {
 
   private companion object {
+    private val logger = LoggerFactory.getLogger(ArriveCardReaderAdapter::class.java)
     private const val CONFIG_CURRENT_PROTOCOL_KEY = "/contactless/hunt/pollscript/modes/current"
     private const val CONFIG_ACTIVE_PROTOCOL_KEY = "/contactless/hunt/pollscript/modes/active"
   }
@@ -166,7 +165,7 @@ internal class ArriveCardReaderAdapter(
   }
 
   override fun onStartDetection() {
-    logger.info(TAG, "Starting card detection...")
+    logger.info("Starting card detection...")
     try {
       huntInterface.startDetection(Bundle())
     } catch (e: RemoteException) {
@@ -175,7 +174,7 @@ internal class ArriveCardReaderAdapter(
   }
 
   override fun onStopDetection() {
-    logger.info(TAG, "Stoping card detection...")
+    logger.info("Stoping card detection...")
     try {
       if (!huntInterface.stopDetection()) {
         throw ReaderIOException("Failed to stop card detection")
@@ -198,21 +197,21 @@ internal class ArriveCardReaderAdapter(
     override fun getListenerId(): String = name
 
     override fun onDetected(data: Bundle) {
-      logger.info(TAG, "Card detected")
+      logger.info("Card detected")
       currentCardId = data.getLong("id")
       currentCardAtr = data.getString("atr")
       cardInsertionWaiterAsynchronousApi.onCardInserted()
     }
 
     override fun onRemoved(data: Bundle) {
-      logger.info(TAG, "Card removed")
+      logger.info("Card removed")
       currentCardId = null
       currentCardAtr = null
       cardRemovalWaiterAsynchronousApi.onCardRemoved()
     }
 
     override fun onError(data: Bundle) {
-      logger.error(TAG, "Card detection error: ${JsonUtil.toJson(data)}")
+      logger.error("Card detection error: ${JsonUtil.toJson(data)}")
     }
   }
 }

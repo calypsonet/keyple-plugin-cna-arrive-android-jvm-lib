@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2026 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -9,12 +9,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  ************************************************************************************** */
-package org.calypsonet.keyple.plugin.flowbird.contact
+package org.calypsonet.keyple.plugin.arrive
 
-/** Represent the physical SAM slots available inside the Flowbird device */
-enum class SamSlot(val slotId: Int) {
-  ONE(0),
-  TWO(1),
-  THREE(2),
-  FOUR(3)
-}
+import org.eclipse.keyple.core.common.KeyplePluginExtension
+
+interface ArrivePlugin : KeyplePluginExtension
