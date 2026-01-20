@@ -1,4 +1,4 @@
-rootProject.name = "keyple-plugin-cna-flowbird-android-java-lib"
+rootProject.name = "keyple-plugin-cna-arrive-android-jvm-lib"
 include(":plugin")
 include(":plugin-mock")
 include(":example-app")
