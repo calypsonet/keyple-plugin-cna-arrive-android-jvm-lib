@@ -1,8 +1,8 @@
-# Keyple Plugin CNA Flowbird Android Java Library
+# Keyple Plugin CNA Arrive Android Java Library
 
 ## Overview
 
-The **Keyple Plugin CNA Flowbird Android Java Library** is an add-on to allow an application using Keyple to interact with Flowbird Android terminals.
+The **Keyple Plugin CNA Arrive Android Java Library** is an add-on to allow an application using Keyple to interact with Arrive Android terminals.
 
 ## Examples
 

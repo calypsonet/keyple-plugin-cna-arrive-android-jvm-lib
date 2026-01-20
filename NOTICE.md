@@ -1,4 +1,4 @@
-# Notices for "Keyple Plugin CNA Flowbird Android Java Lib" Java implementation
+# Notices for "Keyple Plugin CNA Arrive Android Java Lib" Java implementation
 
 This content is produced and maintained by Calypso Networks Association.
 
