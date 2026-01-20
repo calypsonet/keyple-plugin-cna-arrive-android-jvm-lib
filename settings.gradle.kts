@@ -1,6 +1,6 @@
 rootProject.name = "keyple-plugin-cna-flowbird-android-java-lib"
-include(":flowbird-plugin")
-include(":flowbird-plugin-mock")
+include(":plugin")
+include(":plugin-mock")
 include(":example-app")
 
 pluginManagement {

@@ -2,7 +2,7 @@
 *.class
 
 # Private libs
-flowbird-plugin/libs/
+plugin/libs/
 
 # Generated files
 gen/
