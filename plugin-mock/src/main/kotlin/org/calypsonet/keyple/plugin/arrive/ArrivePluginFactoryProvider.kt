@@ -14,7 +14,15 @@ package org.calypsonet.keyple.plugin.arrive
 import android.content.Context
 
 /**
- * Provider of [ArrivePluginFactory] instances.
+ * Singleton provider for creating instances of [ArrivePluginFactory].
+ *
+ * This object is responsible for supplying properly initialized instances of the
+ * [ArrivePluginFactory] interface. It ensures that the required components and services are bound
+ * and configured within the context of the Android application.
+ *
+ * Responsibilities:
+ * - Provides coroutine-based initialization for connecting to necessary Arrive services.
+ * - Returns fully configured factory instances capable of creating Arrive plugin components.
  *
  * @since 3.0.0
  */

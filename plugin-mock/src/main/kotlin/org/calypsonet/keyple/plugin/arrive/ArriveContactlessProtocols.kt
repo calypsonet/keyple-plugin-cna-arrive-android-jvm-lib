@@ -12,32 +12,34 @@
 package org.calypsonet.keyple.plugin.arrive
 
 /**
- * Definition of all supported contactless protocols.
+ * Defines available contactless communication protocols supported by the Arrive plugin.
+ *
+ * This enumeration provides constants that represent the specific ISO/IEC 14443-4 standards,
+ * indicating the type of supported communication between the card and the reader.
  *
  * @since 3.0.0
  */
-enum class ArriveContactlessProtocols(private val techValue: String) {
+enum class ArriveContactlessProtocols(internal val techValue: String) {
 
   /**
-   * ISO 14443-4 (A, B)
+   * Represents the ISO/IEC 14443-4 communication protocol with combined support for Type A and Type
+   * B cards.
    *
    * @since 3.0.0
    */
   ISO_14443_4_AB("ALL"),
 
   /**
-   * ISO 14443-4 (A)
+   * Represents the ISO/IEC 14443-4 communication protocol for Type A cards.
    *
    * @since 3.0.0
    */
   ISO_14443_4_A("A"),
 
   /**
-   * ISO 14443-4 (B)
+   * Represents the ISO/IEC 14443-4 communication protocol for Type B cards.
    *
    * @since 3.0.0
    */
-  ISO_14443_4_B("B");
-
-  internal fun getTechValue(): String = techValue
+  ISO_14443_4_B("B")
 }

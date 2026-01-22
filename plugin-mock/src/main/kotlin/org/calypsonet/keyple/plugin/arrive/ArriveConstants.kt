@@ -12,33 +12,32 @@
 package org.calypsonet.keyple.plugin.arrive
 
 /**
- * Constants related to the Arrive plugin.
+ * Provides constants related to the configuration and usage of the Arrive plugin.
+ *
+ * This object includes details such as plugin and card/SAM reader names.
  *
  * @since 3.0.0
  */
 object ArriveConstants {
 
   /**
-   * The plugin name as registered to the Keyple smart card service.
+   * The plugin name, as registered to the Keyple smart card service.
    *
    * @since 3.0.0
    */
   const val PLUGIN_NAME = "ArrivePlugin"
 
   /**
-   * The card reader name as provided by the plugin.
+   * The card contactless reader name, as provided by the plugin.
    *
    * @since 3.0.0
    */
   const val CARD_READER_NAME = "ArriveCardReader"
 
   /**
-   * Represents the Secure Application Module (SAM) types that are compatible with the Arrive
-   * plugin.
+   * The SAM readers, each associated with a specific reader name, as provided by the plugin.
    *
-   * Each SAM instance is associated with a specific reader name, as provided by the plugin.
-   *
-   * @property readerName The name of the SAM reader associated with the specific SAM type.
+   * @property readerName The name of the SAM reader associated with the specific SAM number.
    * @since 3.0.0
    */
   enum class SAM(val readerName: String) {

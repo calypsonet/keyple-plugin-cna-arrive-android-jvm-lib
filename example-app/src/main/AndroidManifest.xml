@@ -12,7 +12,7 @@
             android:required="true"/>
 
     <application
-        android:name="org.calypsonet.keyple.example.plugin.arrive.DemoApplication"
+        android:name="org.calypsonet.keyple.example.plugin.arrive.ExampleApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -23,7 +23,7 @@
         <activity
             android:name="org.calypsonet.keyple.example.plugin.arrive.MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
+            android:screenOrientation="landscape"
             android:clearTaskOnLaunch="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

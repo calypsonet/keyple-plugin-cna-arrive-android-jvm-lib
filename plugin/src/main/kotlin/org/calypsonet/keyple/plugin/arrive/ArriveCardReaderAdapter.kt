@@ -38,8 +38,39 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRe
 import org.eclipse.keyple.core.util.json.JsonUtil
 import org.eclipse.keyple.core.util.logging.LoggerFactory
 
+/**
+ * Adapter class that provides the functionality required to interact with the Arrive card reader.
+ *
+ * This class acts as a bridge between the Arrive-specific card reader interface and the underlying
+ * device APIs. It manages configurations, handles contactless protocol activation, facilitates APDU
+ * communication with the card, and provides detection management for card insertion and removal
+ * events.
+ *
+ * Responsibilities include:
+ * - Managing the communication sessions via physical channels and ensuring they are properly opened
+ *   and closed.
+ * - Supporting the activation and deactivation of specific contactless protocols.
+ * - Facilitating card insertion and removal events using asynchronous callbacks.
+ * - Enabling APDU commands to be transmitted to the detected card and handling responses
+ *   accordingly.
+ * - Managing the state of card detection to ensure proper operation.
+ *
+ * This class integrates with low-level device services and API components, including:
+ * - `HuntInterface` for device detection events.
+ * - `IApduReader` for transmitting APDU instructions.
+ *
+ * It registers a custom event listener `MyHuntEventListener` to handle events such as card
+ * detection, removal, and errors. The configuration for the card reader is managed using a
+ * `ConfigurationHelper`. The adapter ensures that all operations such as exchanges with the card
+ * are performed off the main UI thread to avoid blocking.
+ *
+ * Exceptions are thrown or propagated in cases of communication failure, timeouts, or invalid input
+ * to maintain reliable operation.
+ *
+ * @since 3.0.0
+ */
 internal class ArriveCardReaderAdapter(
-    private val context: Context,
+    context: Context,
     private val huntInterface: HuntInterface,
     private val iApduReader: IApduReader
 ) :
@@ -64,10 +95,11 @@ internal class ArriveCardReaderAdapter(
   private var currentCardId: Long? = null
   private var currentCardAtr: String? = null
   private var isPhysicalChannelOpen = false
-  private var myHuntEventListener = MyHuntEventListener()
+  private var isCardDetectionStarted: Boolean = false
+  private var huntEventListener = MyHuntEventListener()
 
   init {
-    huntInterface.addEventListener(myHuntEventListener)
+    huntInterface.addEventListener(huntEventListener)
     configurationHelper = ConfigurationHelper(context)
   }
 
@@ -97,17 +129,17 @@ internal class ArriveCardReaderAdapter(
     checkNotOnMainThread()
     return try {
       val responses: List<ByteArray> = runBlocking { suspendExchangeWithCard(listOf(apduIn)) }
-      responses.firstOrNull() ?: throw IllegalStateException("CARD exchange returned no response")
+      responses.firstOrNull() ?: throw IllegalStateException("Card exchange returned no response")
     } catch (_: TimeoutCancellationException) {
-      throw CardIOException("CARD exchange timed out")
+      throw CardIOException("Card exchange timed out")
     } catch (e: CancellationException) {
       throw e
     } catch (e: Exception) {
-      throw CardIOException("CARD exchange failed: ${e.message}", e)
+      throw CardIOException("Card exchange failed", e)
     }
   }
 
-  suspend fun suspendExchangeWithCard(commands: List<ByteArray>): List<ByteArray> =
+  private suspend fun suspendExchangeWithCard(commands: List<ByteArray>): List<ByteArray> =
       withTimeout(5_000L) {
         suspendCancellableCoroutine { cont ->
           val listener =
@@ -139,7 +171,7 @@ internal class ArriveCardReaderAdapter(
 
   override fun onUnregister() {
     onStopDetection()
-    huntInterface.removeEventListener(myHuntEventListener)
+    huntInterface.removeEventListener(huntEventListener)
   }
 
   override fun isProtocolSupported(readerProtocol: String): Boolean {
@@ -153,7 +185,7 @@ internal class ArriveCardReaderAdapter(
 
   override fun activateProtocol(readerProtocol: String) {
     currentProtocol = ArriveContactlessProtocols.valueOf(readerProtocol)
-    configurationHelper.set(CONFIG_CURRENT_PROTOCOL_KEY, currentProtocol!!.getTechValue())
+    configurationHelper.set(CONFIG_CURRENT_PROTOCOL_KEY, currentProtocol!!.techValue)
   }
 
   override fun deactivateProtocol(readerProtocol: String) {
@@ -165,22 +197,28 @@ internal class ArriveCardReaderAdapter(
   }
 
   override fun onStartDetection() {
-    logger.info("Starting card detection...")
+    logger.debug("Starting card detection")
     try {
       huntInterface.startDetection(Bundle())
+      logger.debug("Card detection started")
     } catch (e: RemoteException) {
-      throw ReaderIOException("Failed to start card detection: ${e.message}", e)
+      throw ReaderIOException("Failed to start card detection", e)
     }
+    isCardDetectionStarted = true
   }
 
   override fun onStopDetection() {
-    logger.info("Stoping card detection...")
+    logger.debug("Stopping card detection")
     try {
-      if (!huntInterface.stopDetection()) {
-        throw ReaderIOException("Failed to stop card detection")
+      if (huntInterface.stopDetection()) {
+        logger.debug("Card detection stopped")
+      } else {
+        logger.debug("Card detection was not started")
       }
     } catch (e: RemoteException) {
-      throw ReaderIOException("Failed to stop card detection: ${e.message}", e)
+      throw ReaderIOException("Failed to stop card detection", e)
+    } finally {
+      isCardDetectionStarted = false
     }
   }
 
@@ -208,10 +246,13 @@ internal class ArriveCardReaderAdapter(
       currentCardId = null
       currentCardAtr = null
       cardRemovalWaiterAsynchronousApi.onCardRemoved()
+      if (isCardDetectionStarted) {
+        onStartDetection()
+      }
     }
 
     override fun onError(data: Bundle) {
-      logger.error("Card detection error: ${JsonUtil.toJson(data)}")
+      logger.error("Card detection error: {}", JsonUtil.toJson(data))
     }
   }
 }

@@ -13,4 +13,14 @@ package org.calypsonet.keyple.plugin.arrive
 
 import org.eclipse.keyple.core.common.KeyplePluginExtension
 
+/**
+ * Extends the `KeyplePluginExtension` interface dedicated to the Arrive plugin.
+ *
+ * The Arrive plugin is a Keyple plugin extension that integrates with the Keyple framework to
+ * support specific functionality related to the Arrive system. This includes managing communication
+ * with Arrive card readers and Secure Application Modules (SAMs), and facilitating operations such
+ * as the discovery and interaction with these devices.
+ *
+ * @since 3.0.0
+ */
 interface ArrivePlugin : KeyplePluginExtension

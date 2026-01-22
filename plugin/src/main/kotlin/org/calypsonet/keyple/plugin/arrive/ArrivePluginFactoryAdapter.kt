@@ -26,6 +26,32 @@ import org.eclipse.keyple.core.plugin.spi.PluginFactorySpi
 import org.eclipse.keyple.core.plugin.spi.PluginSpi
 import org.eclipse.keyple.core.util.logging.LoggerFactory
 
+/**
+ * Adapter class for the Arrive plugin factory.
+ *
+ * This class provides the implementation of the `ArrivePluginFactory` interface and serves as a
+ * bridge for integrating the Arrive plugin into the Keyple framework. It manages the initialization
+ * and configuration of necessary components, such as service bindings and intent-based
+ * communications, to enable plugin functionality.
+ *
+ * Responsibilities:
+ * - Initializes and binds to required Arrive services using specified intents.
+ * - Implements the creation of Arrive-specific plugins through the `getPlugin` method.
+ * - Provides version information for both the common API and the plugin API.
+ *
+ * Key Properties:
+ * - `context`: Android context required for initialization and communication with services.
+ * - `bindJoiner`: Manages the connection and binding lifecycle to external services.
+ * - `huntInterface`: Represents the service interface for card operations.
+ * - `iApduReader`: Provides access to the APDU reader for contactless operations.
+ *
+ * Highlights:
+ * - Provides a coroutine-based mechanism to initialize connections using a timeout for graceful
+ *   handling of service readiness.
+ * - Ensures cleanup and unbinding of services in case of cancellations or errors.
+ *
+ * @since 3.0.0
+ */
 internal class ArrivePluginFactoryAdapter(private val context: Context) :
     ArrivePluginFactory, PluginFactorySpi {
 
@@ -50,11 +76,11 @@ internal class ArrivePluginFactoryAdapter(private val context: Context) :
   override fun getPluginApiVersion(): String = PluginApiProperties.VERSION
 
   internal suspend fun init(): ArrivePluginFactoryAdapter {
-    logger.info("Binding to Arrive services...")
+    logger.info("Binding to Arrive services")
     bindJoiner = suspendBindJoinerInitialization(context, initIntents())
     huntInterface = HuntInterface.Stub.asInterface(bindJoiner!!.getService(HUNT_INTENT_NAME))
     iApduReader = IApduReader.Stub.asInterface(bindJoiner!!.getService(APDU_INTENT_NAME))
-    logger.info("Arrive services bound")
+    logger.info("Arrive services bounded")
     return this
   }
 
@@ -103,7 +129,7 @@ internal class ArrivePluginFactoryAdapter(private val context: Context) :
                     return
                   }
                   logger.error("Arrive services connection lost")
-                  cont.resumeWithException(IllegalStateException("Bind lost for intent: $intent"))
+                  cont.resumeWithException(IllegalStateException("Bind lost for intent $intent"))
                 }
               }
 
@@ -112,7 +138,7 @@ internal class ArrivePluginFactoryAdapter(private val context: Context) :
           bindJoiner.bind()
 
           cont.invokeOnCancellation {
-            logger.error("Unbinding from Arrive services on cancellation...")
+            logger.error("Unbinding from Arrive services on cancellation")
             bindJoiner.unbind()
           }
         }

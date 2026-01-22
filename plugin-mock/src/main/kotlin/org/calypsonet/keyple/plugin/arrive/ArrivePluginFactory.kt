@@ -13,4 +13,12 @@ package org.calypsonet.keyple.plugin.arrive
 
 import org.eclipse.keyple.core.common.KeyplePluginExtensionFactory
 
+/**
+ * Extends the `KeyplePluginExtensionFactory` interface, which must be registered with the Keyple
+ * smart card service to communicate with Arrive Android-based terminals.
+ *
+ * Use [ArrivePluginFactoryProvider] to retrieve an instance of it.
+ *
+ * @since 3.0.0
+ */
 interface ArrivePluginFactory : KeyplePluginExtensionFactory

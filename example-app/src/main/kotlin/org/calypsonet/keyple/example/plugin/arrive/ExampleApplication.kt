@@ -14,9 +14,11 @@ package org.calypsonet.keyple.example.plugin.arrive
 import android.app.Application
 import timber.log.Timber
 
-class DemoApplication : Application() {
+class ExampleApplication : Application() {
   override fun onCreate() {
     super.onCreate()
-    Timber.plant(Timber.DebugTree())
+    if (BuildConfig.DEBUG) {
+      Timber.plant(Timber.DebugTree())
+    }
   }
 }
