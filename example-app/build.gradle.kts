@@ -78,7 +78,10 @@ android {
     versionCode = (project.findProperty("androidAppVersionCode") as String).toInt()
     versionName = project.findProperty("androidAppVersionName") as String
   }
-  buildFeatures { viewBinding = true }
+  buildFeatures {
+    buildConfig = true
+    viewBinding = true
+  }
   buildTypes {
     getByName("release") {
       isMinifyEnabled = false
