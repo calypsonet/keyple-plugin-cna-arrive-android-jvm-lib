@@ -42,7 +42,7 @@ dependencies {
   implementation("androidx.multidex:multidex:2.0.1")
   // Kotlin
   implementation("androidx.core:core-ktx:1.12.0")
-  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.20")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
   // Coroutines
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
@@ -88,7 +88,6 @@ android {
   compileOptions {
     sourceCompatibility = JavaVersion.toVersion(javaSourceLevel)
     targetCompatibility = JavaVersion.toVersion(javaTargetLevel)
-    println("Compiling Java $sourceCompatibility to Java $targetCompatibility")
   }
   kotlinOptions { jvmTarget = javaTargetLevel }
   sourceSets {
