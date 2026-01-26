@@ -77,7 +77,7 @@ import org.eclipse.keyple.core.util.logging.LoggerFactory
 internal class ArriveCardReaderAdapter(
     context: Context,
     private val huntInterface: HuntInterface,
-    private val iApduReader: IApduReader
+    private val iApduReader: IApduReader,
 ) :
     ArriveCardReader,
     ConfigurableReaderSpi,
@@ -144,7 +144,8 @@ internal class ArriveCardReaderAdapter(
           JsonUtil.toJson(
             firstResponse
           )
-        }")
+        }"
+        )
       }
       firstResponse
     } catch (_: TimeoutCancellationException) {

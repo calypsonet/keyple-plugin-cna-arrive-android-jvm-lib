@@ -49,7 +49,7 @@ import org.eclipse.keyple.core.util.logging.LoggerFactory
 internal class ArriveSamReaderAdapter(
     private val sam: ArriveConstants.SAM,
     private val samAtrHex: String,
-    private val iApduReader: IApduReader
+    private val iApduReader: IApduReader,
 ) : ArriveSamReader, ReaderSpi {
 
   private companion object {
@@ -88,7 +88,8 @@ internal class ArriveSamReaderAdapter(
       val firstResponse = responses.firstOrNull()
       if (firstResponse == null || firstResponse.size < 2) {
         throw IllegalStateException(
-            "SAM exchange returned invalid response data=${JsonUtil.toJson(firstResponse)}")
+            "SAM exchange returned invalid response data=${JsonUtil.toJson(firstResponse)}"
+        )
       }
       firstResponse
     } catch (_: TimeoutCancellationException) {

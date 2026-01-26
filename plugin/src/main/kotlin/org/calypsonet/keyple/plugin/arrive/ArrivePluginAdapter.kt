@@ -35,7 +35,7 @@ internal class ArrivePluginAdapter(
     private val context: Context,
     private val bindJoiner: BindJoiner,
     private val huntInterface: HuntInterface,
-    private val iApduReader: IApduReader
+    private val iApduReader: IApduReader,
 ) : ArrivePlugin, PluginSpi {
 
   private companion object {
@@ -50,8 +50,8 @@ internal class ArrivePluginAdapter(
       add(ArriveCardReaderAdapter(context, huntInterface, iApduReader))
       ArriveConstants.SAM.values().forEach { sam ->
         add(
-            ArriveSamReaderAdapter(
-                sam, stateHelper.getAsString(sam.systemStateVarAtr), iApduReader))
+            ArriveSamReaderAdapter(sam, stateHelper.getAsString(sam.systemStateVarAtr), iApduReader)
+        )
       }
     }
   }

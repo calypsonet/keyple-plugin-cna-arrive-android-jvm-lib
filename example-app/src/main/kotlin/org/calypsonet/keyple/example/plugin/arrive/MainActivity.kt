@@ -119,7 +119,7 @@ class MainActivity :
   private fun showAlertDialogWithAction(
       titleRes: String,
       messageRes: String,
-      onOkClick: () -> Unit
+      onOkClick: () -> Unit,
   ) {
     lifecycleScope.launch(Dispatchers.Main) {
       AlertDialog.Builder(this@MainActivity)
@@ -142,9 +142,10 @@ class MainActivity :
       Timber.e(e, "Failed to initialize transaction")
       showAlertDialogWithAction(
           "Initialization Error",
-          "Unable to initialize the application\n\nThe application will now close") {
-            finishAffinity()
-          }
+          "Unable to initialize the application\n\nThe application will now close",
+      ) {
+        finishAffinity()
+      }
     }
   }
 
@@ -163,7 +164,9 @@ class MainActivity :
     cardReader.addObserver(this)
 
     (cardReader as ConfigurableCardReader).activateProtocol(
-        ArriveContactlessProtocols.ISO_14443_4.name, ISO_14443_4_LOGICAL_PROTOCOL)
+        ArriveContactlessProtocols.ISO_14443_4.name,
+        ISO_14443_4_LOGICAL_PROTOCOL,
+    )
 
     // init SAM reader
     samReader = arrivePlugin.getReader(ArriveConstants.SAM.SAM_1.readerName)
@@ -182,10 +185,12 @@ class MainActivity :
             .readerApiFactory
             .createBasicCardSelector()
             .filterByPowerOnData(
-                LegacySamUtil.buildPowerOnDataFilter(LegacySam.ProductType.SAM_C1, null)),
+                LegacySamUtil.buildPowerOnDataFilter(LegacySam.ProductType.SAM_C1, null)
+            ),
         LegacySamExtensionService.getInstance()
             .legacySamApiFactory
-            .createLegacySamSelectionExtension())
+            .createLegacySamSelectionExtension(),
+    )
 
     try {
       val samSelectionResult = samSelectionManager.processCardSelectionScenario(samReader)
@@ -199,7 +204,10 @@ class MainActivity :
                   LegacySamExtensionService.getInstance()
                       .legacySamApiFactory
                       .createSymmetricCryptoCardTransactionManagerFactory(
-                          samReader, samSelectionResult.activeSmartCard!! as LegacySam))
+                          samReader,
+                          samSelectionResult.activeSmartCard!! as LegacySam,
+                      )
+              )
               .assignDefaultKif(PERSONALIZATION, 0x21) // required for old Innovatron B Prime cards
               .assignDefaultKif(LOAD, 0x27)
               .assignDefaultKif(DEBIT, 0x30)
@@ -210,7 +218,8 @@ class MainActivity :
       showAlertDialogWithAction(
           "SAM Error",
           "Unable to communicate with the SAM\n\nThe application will now close",
-          onOkClick = { finishAffinity() })
+          onOkClick = { finishAffinity() },
+      )
     }
   }
 
@@ -224,7 +233,8 @@ class MainActivity :
             .filterByDfName(CalypsoConstants.AID),
         CalypsoExtensionService.getInstance()
             .calypsoCardApiFactory
-            .createCalypsoCardSelectionExtension())
+            .createCalypsoCardSelectionExtension(),
+    )
     cardSelectionManager.scheduleCardSelectionScenario(cardReader, ALWAYS)
     Timber.i("Card selection prepared")
   }
@@ -236,7 +246,8 @@ class MainActivity :
         MessageType.ACTION,
         "Waiting for card presentation...\n" +
             "\nAcceptable cards:" +
-            "\n- Calypso (AID: ${CalypsoConstants.AID})")
+            "\n- Calypso (AID: ${CalypsoConstants.AID})",
+    )
     Timber.i("Card detection started")
   }
 
@@ -269,7 +280,8 @@ class MainActivity :
     try {
       val selectionsResult =
           cardSelectionManager.parseScheduledCardSelectionsResponse(
-              cardReaderEvent.scheduledCardSelectionsResponse)
+              cardReaderEvent.scheduledCardSelectionsResponse
+          )
       when (val card = selectionsResult.activeSmartCard) {
         is CalypsoCard -> {
           handleCalypsoCard(card)
@@ -301,12 +313,14 @@ class MainActivity :
               CalypsoConstants.SFI_ENV_HOLDER,
               CalypsoConstants.REC_1,
               CalypsoConstants.REC_1,
-              CalypsoConstants.REC_SIZE)
+              CalypsoConstants.REC_SIZE,
+          )
           .prepareReadRecords(
               CalypsoConstants.SFI_EVENT_LOG,
               CalypsoConstants.REC_1,
               CalypsoConstants.REC_1,
-              CalypsoConstants.REC_SIZE)
+              CalypsoConstants.REC_SIZE,
+          )
           .prepareCloseSecureSession()
           .processCommands(ChannelControl.CLOSE_AFTER)
     }
@@ -323,14 +337,16 @@ class MainActivity :
     addMessage(MessageType.ACTION, "Starting secure transaction")
     addMessage(
         MessageType.RESULT,
-        "EnvironmentHolder file:\n$efEnvironmentHolder\n\nEventLog file:\n$eventLog")
+        "EnvironmentHolder file:\n$efEnvironmentHolder\n\nEventLog file:\n$eventLog",
+    )
     addMessage(MessageType.ACTION, "Transaction duration: $duration ms")
   }
 
   private fun handleCardInsertedEvent() {
     addMessage(
         MessageType.EVENT,
-        "Unrecognized card: ${(cardReader as ConfigurableCardReader).currentProtocol ?: "unsupported protocol"}")
+        "Unrecognized card: ${(cardReader as ConfigurableCardReader).currentProtocol ?: "unsupported protocol"}",
+    )
     cardReader.finalizeCardProcessing()
     addMessage(MessageType.ACTION, "Waiting for card removal...")
   }
@@ -341,6 +357,7 @@ class MainActivity :
         MessageType.ACTION,
         "Waiting for card presentation...\n" +
             "\nAcceptable cards:" +
-            "\n- Calypso (AID: ${CalypsoConstants.AID})")
+            "\n- Calypso (AID: ${CalypsoConstants.AID})",
+    )
   }
 }

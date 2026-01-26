@@ -30,5 +30,5 @@ enum class ArriveContactlessProtocols(internal val transportTypeValue: Int) {
    *
    * @since 3.0.0
    */
-  INNOVATRON_B_PRIME(2)
+  INNOVATRON_B_PRIME(2),
 }

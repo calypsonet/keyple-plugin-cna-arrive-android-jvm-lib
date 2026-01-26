@@ -99,7 +99,7 @@ internal class ArrivePluginFactoryAdapter(private val context: Context) :
 
   private suspend fun suspendBindJoinerInitialization(
       context: Context,
-      intents: Map<String, Intent>
+      intents: Map<String, Intent>,
   ): BindJoiner =
       withTimeout(5_000L) {
         suspendCancellableCoroutine { cont ->
@@ -119,7 +119,8 @@ internal class ArrivePluginFactoryAdapter(private val context: Context) :
                   } else {
                     logger.error("Arrive services connection established but init not done")
                     cont.resumeWithException(
-                        IllegalStateException("BindJoiner joined but init not done"))
+                        IllegalStateException("BindJoiner joined but init not done")
+                    )
                   }
                 }
 
