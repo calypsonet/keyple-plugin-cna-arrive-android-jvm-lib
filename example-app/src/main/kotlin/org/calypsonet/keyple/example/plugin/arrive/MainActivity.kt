@@ -163,7 +163,7 @@ class MainActivity :
     cardReader.addObserver(this)
 
     (cardReader as ConfigurableCardReader).activateProtocol(
-        ArriveContactlessProtocols.ISO_14443_4_AB.name, ISO_14443_4_LOGICAL_PROTOCOL)
+        ArriveContactlessProtocols.ISO_14443_4.name, ISO_14443_4_LOGICAL_PROTOCOL)
 
     // init SAM reader
     samReader = arrivePlugin.getReader(ArriveConstants.SAM.SAM_1.readerName)
@@ -330,7 +330,7 @@ class MainActivity :
   private fun handleCardInsertedEvent() {
     addMessage(
         MessageType.EVENT,
-        "Unrecognized card: ${(cardReader as ConfigurableCardReader).currentProtocol}")
+        "Unrecognized card: ${(cardReader as ConfigurableCardReader).currentProtocol ?: "unsupported protocol"}")
     cardReader.finalizeCardProcessing()
     addMessage(MessageType.ACTION, "Waiting for card removal...")
   }

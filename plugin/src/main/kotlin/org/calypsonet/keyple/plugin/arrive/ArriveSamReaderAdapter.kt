@@ -24,6 +24,7 @@ import kotlinx.coroutines.withTimeout
 import org.calypsonet.keyple.plugin.arrive.ArriveUtils.checkNotOnMainThread
 import org.eclipse.keyple.core.plugin.CardIOException
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi
+import org.eclipse.keyple.core.util.json.JsonUtil
 import org.eclipse.keyple.core.util.logging.LoggerFactory
 
 /**
@@ -84,7 +85,12 @@ internal class ArriveSamReaderAdapter(
     checkNotOnMainThread()
     return try {
       val responses: List<ByteArray> = runBlocking { suspendExchangeWithSam(listOf(apduIn)) }
-      responses.firstOrNull() ?: throw IllegalStateException("SAM exchange returned no response")
+      val firstResponse = responses.firstOrNull()
+      if (firstResponse == null || firstResponse.size < 2) {
+        throw IllegalStateException(
+            "SAM exchange returned invalid response data=${JsonUtil.toJson(firstResponse)}")
+      }
+      firstResponse
     } catch (_: TimeoutCancellationException) {
       throw CardIOException("SAM exchange timed out")
     } catch (e: CancellationException) {

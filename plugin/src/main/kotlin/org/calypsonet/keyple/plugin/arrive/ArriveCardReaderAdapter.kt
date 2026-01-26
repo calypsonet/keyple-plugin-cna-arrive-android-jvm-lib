@@ -17,12 +17,17 @@ import android.os.RemoteException
 import com.parkeon.data.ConfigurationHelper
 import com.parkeon.periphs.reader.IApduReader
 import com.parkeon.periphs.reader.IApduReaderExchangeListener
+import com.parkeon.services.hunt.HuntConstants
 import com.parkeon.services.hunt.HuntEventListener
 import com.parkeon.services.hunt.HuntInterface
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
@@ -82,8 +87,10 @@ internal class ArriveCardReaderAdapter(
 
   private companion object {
     private val logger = LoggerFactory.getLogger(ArriveCardReaderAdapter::class.java)
-    private const val CONFIG_CURRENT_PROTOCOL_KEY = "/contactless/hunt/pollscript/modes/current"
-    private const val CONFIG_ACTIVE_PROTOCOL_KEY = "/contactless/hunt/pollscript/modes/active"
+    private const val CONFIG_PROTOCOL_A_KEY = "/contactless/hunt/A"
+    private const val CONFIG_PROTOCOL_B_KEY = "/contactless/hunt/B"
+    private const val CONFIG_PROTOCOL_BP_KEY = "/contactless/hunt/BP"
+    private const val TAG_CARD_ID = "id"
   }
 
   private lateinit var cardInsertionWaiterAsynchronousApi: CardInsertionWaiterAsynchronousApi
@@ -91,9 +98,10 @@ internal class ArriveCardReaderAdapter(
 
   private var configurationHelper: ConfigurationHelper
 
-  private var currentProtocol: ArriveContactlessProtocols? = null
+  private var currentCardProtocol: Int? = null
   private var currentCardId: Long? = null
   private var currentCardAtr: String? = null
+
   private var isPhysicalChannelOpen = false
   private var isCardDetectionStarted: Boolean = false
   private var huntEventListener = MyHuntEventListener()
@@ -129,7 +137,16 @@ internal class ArriveCardReaderAdapter(
     checkNotOnMainThread()
     return try {
       val responses: List<ByteArray> = runBlocking { suspendExchangeWithCard(listOf(apduIn)) }
-      responses.firstOrNull() ?: throw IllegalStateException("Card exchange returned no response")
+      val firstResponse = responses.firstOrNull()
+      if (firstResponse == null || firstResponse.size < 2) {
+        throw IllegalStateException(
+            "Card exchange returned invalid response data=${
+          JsonUtil.toJson(
+            firstResponse
+          )
+        }")
+      }
+      firstResponse
     } catch (_: TimeoutCancellationException) {
       throw CardIOException("Card exchange timed out")
     } catch (e: CancellationException) {
@@ -184,16 +201,34 @@ internal class ArriveCardReaderAdapter(
   }
 
   override fun activateProtocol(readerProtocol: String) {
-    currentProtocol = ArriveContactlessProtocols.valueOf(readerProtocol)
-    configurationHelper.set(CONFIG_CURRENT_PROTOCOL_KEY, currentProtocol!!.techValue)
+    val protocol = ArriveContactlessProtocols.valueOf(readerProtocol)
+    when (protocol) {
+      ArriveContactlessProtocols.ISO_14443_4 -> {
+        configurationHelper.set(CONFIG_PROTOCOL_A_KEY, 1)
+        configurationHelper.set(CONFIG_PROTOCOL_B_KEY, 1)
+      }
+      ArriveContactlessProtocols.INNOVATRON_B_PRIME -> {
+        configurationHelper.set(CONFIG_PROTOCOL_BP_KEY, 1)
+      }
+    }
   }
 
   override fun deactivateProtocol(readerProtocol: String) {
-    // NOP
+    val protocol = ArriveContactlessProtocols.valueOf(readerProtocol)
+    when (protocol) {
+      ArriveContactlessProtocols.ISO_14443_4 -> {
+        configurationHelper.set(CONFIG_PROTOCOL_A_KEY, 0)
+        configurationHelper.set(CONFIG_PROTOCOL_B_KEY, 0)
+      }
+      ArriveContactlessProtocols.INNOVATRON_B_PRIME -> {
+        configurationHelper.set(CONFIG_PROTOCOL_BP_KEY, 0)
+      }
+    }
   }
 
   override fun isCurrentProtocol(readerProtocol: String): Boolean {
-    return currentProtocol?.let { it.name == readerProtocol } ?: false
+    val protocol = ArriveContactlessProtocols.valueOf(readerProtocol)
+    return currentCardProtocol?.let { it == protocol.transportTypeValue } ?: false
   }
 
   override fun onStartDetection() {
@@ -236,9 +271,12 @@ internal class ArriveCardReaderAdapter(
 
     override fun onDetected(data: Bundle) {
       logger.info("Card detected")
-      currentCardId = data.getLong("id")
-      currentCardAtr = data.getString("atr")
-      cardInsertionWaiterAsynchronousApi.onCardInserted()
+      currentCardProtocol = data.getInt(HuntConstants.TAG_CARD_TYPE_TRANSPORT)
+      currentCardId = data.getLong(TAG_CARD_ID)
+      currentCardAtr = data.getString(HuntConstants.TAG_ATR)
+      if (isCardDetectionStarted) {
+        cardInsertionWaiterAsynchronousApi.onCardInserted()
+      }
     }
 
     override fun onRemoved(data: Bundle) {
@@ -252,7 +290,13 @@ internal class ArriveCardReaderAdapter(
     }
 
     override fun onError(data: Bundle) {
-      logger.error("Card detection error: {}", JsonUtil.toJson(data))
+      logger.error("Card detection error errorData={}", JsonUtil.toJson(data))
+      CoroutineScope(Dispatchers.IO).launch {
+        delay(500)
+        if (isCardDetectionStarted) {
+          onStartDetection()
+        }
+      }
     }
   }
 }
