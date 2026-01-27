@@ -62,8 +62,12 @@ class MainActivity :
   private lateinit var messageDisplayAdapter: RecyclerView.Adapter<*>
   private val messages = arrayListOf<Message>()
 
-  companion object {
-    const val ISO_14443_4_LOGICAL_PROTOCOL = "ISO_14443_4"
+  private companion object {
+    private const val ISO_14443_4_LOGICAL_PROTOCOL = "ISO_14443_4"
+    private const val MSG_WAITING_FOR_CARD_PRESENTATION =
+        "Waiting for card presentation...\n" +
+            "\nAcceptable cards:" +
+            "\n- Calypso (AID: ${CalypsoConstants.AID})"
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -244,9 +248,7 @@ class MainActivity :
     cardReader.startCardDetection(REPEATING)
     addMessage(
         MessageType.ACTION,
-        "Waiting for card presentation...\n" +
-            "\nAcceptable cards:" +
-            "\n- Calypso (AID: ${CalypsoConstants.AID})",
+        MSG_WAITING_FOR_CARD_PRESENTATION,
     )
     Timber.i("Card detection started")
   }
