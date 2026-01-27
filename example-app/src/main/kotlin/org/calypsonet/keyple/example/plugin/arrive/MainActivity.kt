@@ -357,9 +357,7 @@ class MainActivity :
     addMessage(MessageType.EVENT, "Card removed")
     addMessage(
         MessageType.ACTION,
-        "Waiting for card presentation...\n" +
-            "\nAcceptable cards:" +
-            "\n- Calypso (AID: ${CalypsoConstants.AID})",
+        MSG_WAITING_FOR_CARD_PRESENTATION,
     )
   }
 }
