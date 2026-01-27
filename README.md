@@ -7,8 +7,8 @@ Keyple to interact with Arrive Android terminals.
 
 ## Requirements
 
-- **Android 8+**: API Level `26+`
-- **Arrive SDK**: Version `2.0+` (tested initially with Version `2.0.9`)
+- **Android**: API level 26 or higher (Android 8.0+)
+- **Arrive SDK**: Version 2.0 or later (initially tested with 2.0.9)
 
 ## Build Prerequisites
 
