@@ -140,11 +140,11 @@ internal class ArriveCardReaderAdapter(
       val firstResponse = responses.firstOrNull()
       if (firstResponse == null || firstResponse.size < 2) {
         throw IllegalStateException(
-            "Card exchange returned invalid response data=${
+            "Card exchange returned invalid response [data=${
           JsonUtil.toJson(
             firstResponse
           )
-        }"
+        }]"
         )
       }
       firstResponse
@@ -170,7 +170,7 @@ internal class ArriveCardReaderAdapter(
                   if (result) {
                     @Suppress("UNCHECKED_CAST") cont.resume(responses as List<ByteArray>)
                   } else {
-                    cont.resumeWithException(RemoteException("CARD exchange returned no response"))
+                    cont.resumeWithException(RemoteException("Card exchange returned no response"))
                   }
                 }
               }
@@ -291,7 +291,7 @@ internal class ArriveCardReaderAdapter(
     }
 
     override fun onError(data: Bundle) {
-      logger.error("Card detection error errorData={}", JsonUtil.toJson(data))
+      logger.error("Card detection error [errorData={}]", JsonUtil.toJson(data))
       CoroutineScope(Dispatchers.IO).launch {
         delay(500)
         if (isCardDetectionStarted) {

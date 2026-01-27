@@ -60,7 +60,7 @@ internal class ArrivePluginAdapter(
     try {
       bindJoiner.unbind()
     } catch (ex: Exception) {
-      logger.warn("Failed to unregister plugin errMsg={}", ex.message)
+      logger.warn("Failed to unbind properly from Arrive services [reason={}]", ex.message)
     }
   }
 }

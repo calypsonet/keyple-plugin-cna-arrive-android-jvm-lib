@@ -272,7 +272,7 @@ class MainActivity :
   }
 
   override fun onReaderObservationError(pluginName: String, readerName: String, e: Throwable) {
-    addMessage(MessageType.EVENT, "Reader observation error: ${e.message}")
+    addMessage(MessageType.EVENT, "Reader observation error [reason=${e.message}]")
     Timber.e(e, "Failed to observe reader")
   }
 
@@ -291,8 +291,8 @@ class MainActivity :
         }
       }
     } catch (e: Exception) {
-      Timber.e(e)
-      addMessage(MessageType.RESULT, "Exception: ${e.message}")
+      Timber.e(e, "Failed to process card transaction")
+      addMessage(MessageType.RESULT, "Failed to process card transaction [reason=${e.message}]")
     } finally {
       cardReader.finalizeCardProcessing()
       addMessage(MessageType.ACTION, "Waiting for card removal...")
