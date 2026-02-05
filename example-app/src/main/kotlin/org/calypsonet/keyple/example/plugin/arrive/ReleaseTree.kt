@@ -11,16 +11,20 @@
  ************************************************************************************** */
 package org.calypsonet.keyple.example.plugin.arrive
 
-import android.app.Application
+import android.util.Log
 import timber.log.Timber
 
-class ExampleApplication : Application() {
-  override fun onCreate() {
-    super.onCreate()
-    if (BuildConfig.DEBUG) {
-      Timber.plant(Timber.DebugTree())
-    } else {
-      Timber.plant(ReleaseTree())
-    }
+/**
+ * A [Timber.Tree] implementation for release builds.
+ *
+ * This tree is designed to filter out less important log messages, only allowing logs with a
+ * priority of `Log.INFO` or higher (i.e., `INFO`, `WARN`, `ERROR`, `ASSERT`) to be recorded. Debug
+ * and verbose logs are ignored, which is a common practice for production/release applications to
+ * reduce noise and improve performance.
+ */
+class ReleaseTree : Timber.DebugTree() {
+
+  override fun isLoggable(tag: String?, priority: Int): Boolean {
+    return priority >= Log.INFO
   }
 }

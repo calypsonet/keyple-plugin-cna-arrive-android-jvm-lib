@@ -24,7 +24,7 @@ import org.eclipse.keyple.core.common.CommonApiProperties
 import org.eclipse.keyple.core.plugin.PluginApiProperties
 import org.eclipse.keyple.core.plugin.spi.PluginFactorySpi
 import org.eclipse.keyple.core.plugin.spi.PluginSpi
-import org.eclipse.keyple.core.util.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 
 /**
  * Adapter class for the Arrive plugin factory.

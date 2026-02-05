@@ -18,7 +18,7 @@ import com.parkeon.periphs.reader.IApduReader
 import com.parkeon.services.hunt.HuntInterface
 import org.eclipse.keyple.core.plugin.spi.PluginSpi
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi
-import org.eclipse.keyple.core.util.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 
 /**
  * Adapter class for the Arrive plugin implementation.

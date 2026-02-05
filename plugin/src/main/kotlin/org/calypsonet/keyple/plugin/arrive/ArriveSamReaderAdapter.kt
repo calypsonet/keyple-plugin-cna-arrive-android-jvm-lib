@@ -25,7 +25,7 @@ import org.calypsonet.keyple.plugin.arrive.ArriveUtils.checkNotOnMainThread
 import org.eclipse.keyple.core.plugin.CardIOException
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi
 import org.eclipse.keyple.core.util.json.JsonUtil
-import org.eclipse.keyple.core.util.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 
 /**
  * Adapter implementation for the `ArriveSamReader` that bridges functionality between the Arrive
@@ -62,7 +62,9 @@ internal class ArriveSamReaderAdapter(
 
   override fun openPhysicalChannel() {
     isPhysicalChannelOpen = true
-    logger.debug("SAM channel opened [atr={}]", samAtrHex)
+    if (logger.isDebugEnabled) {
+      logger.debug("SAM channel opened [sam=[{}], atr={}]", sam.readerName, samAtrHex)
+    }
   }
 
   override fun closePhysicalChannel() {

@@ -41,7 +41,7 @@ import org.eclipse.keyple.core.plugin.spi.reader.observable.ObservableReaderSpi
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.insertion.CardInsertionWaiterAsynchronousSpi
 import org.eclipse.keyple.core.plugin.spi.reader.observable.state.removal.CardRemovalWaiterAsynchronousSpi
 import org.eclipse.keyple.core.util.json.JsonUtil
-import org.eclipse.keyple.core.util.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 
 /**
  * Adapter class that provides the functionality required to interact with the Arrive card reader.
@@ -233,10 +233,14 @@ internal class ArriveCardReaderAdapter(
   }
 
   override fun onStartDetection() {
-    logger.debug("Starting card detection")
+    if (logger.isDebugEnabled) {
+      logger.debug("Starting card detection")
+    }
     try {
       huntInterface.startDetection(Bundle())
-      logger.debug("Card detection started")
+      if (logger.isDebugEnabled) {
+        logger.debug("Card detection started")
+      }
     } catch (e: RemoteException) {
       throw ReaderIOException("Failed to start card detection", e)
     }
@@ -244,12 +248,18 @@ internal class ArriveCardReaderAdapter(
   }
 
   override fun onStopDetection() {
-    logger.debug("Stopping card detection")
+    if (logger.isDebugEnabled) {
+      logger.debug("Stopping card detection")
+    }
     try {
       if (huntInterface.stopDetection()) {
-        logger.debug("Card detection stopped")
+        if (logger.isDebugEnabled) {
+          logger.debug("Card detection stopped")
+        }
       } else {
-        logger.debug("Card detection was not started")
+        if (logger.isDebugEnabled) {
+          logger.debug("Card detection was not started")
+        }
       }
     } catch (e: RemoteException) {
       throw ReaderIOException("Failed to stop card detection", e)
@@ -271,7 +281,9 @@ internal class ArriveCardReaderAdapter(
     override fun getListenerId(): String = name
 
     override fun onDetected(data: Bundle) {
-      logger.info("Card detected")
+      if (logger.isDebugEnabled) {
+        logger.debug("Card detected [data={}]", JsonUtil.toJson(data))
+      }
       currentCardProtocol = data.getInt(HuntConstants.TAG_CARD_TYPE_TRANSPORT)
       currentCardId = data.getLong(TAG_CARD_ID)
       currentCardAtr = data.getString(HuntConstants.TAG_ATR)
@@ -281,7 +293,9 @@ internal class ArriveCardReaderAdapter(
     }
 
     override fun onRemoved(data: Bundle) {
-      logger.info("Card removed")
+      if (logger.isDebugEnabled) {
+        logger.debug("Card removed [data={}]", JsonUtil.toJson(data))
+      }
       currentCardId = null
       currentCardAtr = null
       cardRemovalWaiterAsynchronousApi.onCardRemoved()
