@@ -23,7 +23,7 @@ dependencies {
   // 'https://keyple.org/components/overview/configuration-wizard/')
   implementation("org.eclipse.keyple:keyple-common-java-api:2.0.2")
   implementation("org.eclipse.keyple:keyple-plugin-java-api:2.3.2")
-  implementation("org.eclipse.keyple:keyple-util-java-lib:2.4.1-SNAPSHOT") { isChanging = true }
+  implementation("org.eclipse.keyple:keyple-util-java-lib:2.4.1")
   // End Keyple configuration
   // Kotlin
   implementation("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
