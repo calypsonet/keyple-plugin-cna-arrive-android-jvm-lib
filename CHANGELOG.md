@@ -32,10 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2021-01-29
 This is the initial release.
 
-[unreleased]: https://github.com/calypsonet/keyple-plugin-cna-flowbird-android-java-lib/compare/2.0.1...HEAD
-[2.0.1]: https://github.com/calypsonet/keyple-plugin-cna-flowbird-android-java-lib/compare/2.0.0...2.0.1
-[2.0.0]: https://github.com/calypsonet/keyple-plugin-cna-flowbird-android-java-lib/compare/1.1.0...2.0.0
-[1.1.0]: https://github.com/calypsonet/keyple-plugin-cna-flowbird-android-java-lib/releases/tag/1.1.0
+[unreleased]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/compare/2.0.1...HEAD
+[2.0.1]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/compare/2.0.0...2.0.1
+[2.0.0]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/compare/1.1.0...2.0.0
+[1.1.0]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/releases/tag/1.1.0
 
-[#7]: https://github.com/calypsonet/keyple-plugin-cna-flowbird-android-java-lib/issues/7
-[#5]: https://github.com/calypsonet/keyple-plugin-cna-flowbird-android-java-lib/issues/5
+[#7]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/issues/7
+[#5]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/issues/5
