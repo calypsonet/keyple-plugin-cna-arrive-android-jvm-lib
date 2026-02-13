@@ -20,17 +20,8 @@ import com.parkeon.periphs.reader.IApduReaderExchangeListener
 import com.parkeon.services.hunt.HuntConstants
 import com.parkeon.services.hunt.HuntEventListener
 import com.parkeon.services.hunt.HuntInterface
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeout
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.calypsonet.keyple.plugin.arrive.ArriveUtils.checkNotOnMainThread
 import org.eclipse.keyple.core.plugin.CardIOException
 import org.eclipse.keyple.core.plugin.CardInsertionWaiterAsynchronousApi
@@ -135,53 +126,38 @@ internal class ArriveCardReaderAdapter(
 
   override fun transmitApdu(apduIn: ByteArray): ByteArray {
     checkNotOnMainThread()
-    return try {
-      val responses: List<ByteArray> = runBlocking { suspendExchangeWithCard(listOf(apduIn)) }
-      val firstResponse = responses.firstOrNull()
-      if (firstResponse == null || firstResponse.size < 2) {
+    val latch = CountDownLatch(1)
+    var response: ByteArray? = null
+    try {
+      iApduReader.exchangeWithCard(
+          currentCardId ?: 0,
+          listOf(apduIn),
+          object : IApduReaderExchangeListener.Stub() {
+            override fun onExchangeDone(id: Long, result: Boolean, responses: List<*>?) {
+              if (result && responses != null && responses.isNotEmpty()) {
+                @Suppress("UNCHECKED_CAST")
+                response = (responses as List<ByteArray>).first()
+              }
+              latch.countDown()
+            }
+          },
+      )
+      if (!latch.await(5, TimeUnit.SECONDS)) {
+        throw CardIOException("Card exchange timed out")
+      }
+      val r = response
+      if (r == null || r.size < 2) {
         throw IllegalStateException(
-            "Card exchange returned invalid response [data=${
-          JsonUtil.toJson(
-            firstResponse
-          )
-        }]"
+            "Card exchange returned invalid response [data=${JsonUtil.toJson(r)}]"
         )
       }
-      firstResponse
-    } catch (_: TimeoutCancellationException) {
-      throw CardIOException("Card exchange timed out")
-    } catch (e: CancellationException) {
+      return r
+    } catch (e: CardIOException) {
       throw e
     } catch (e: Exception) {
       throw CardIOException("Card exchange failed", e)
     }
   }
-
-  private suspend fun suspendExchangeWithCard(commands: List<ByteArray>): List<ByteArray> =
-      withTimeout(5_000L) {
-        suspendCancellableCoroutine { cont ->
-          val listener =
-              object : IApduReaderExchangeListener.Stub() {
-
-                override fun onExchangeDone(id: Long, result: Boolean, responses: List<*>?) {
-                  if (!cont.isActive) {
-                    return
-                  }
-                  if (result) {
-                    @Suppress("UNCHECKED_CAST") cont.resume(responses as List<ByteArray>)
-                  } else {
-                    cont.resumeWithException(RemoteException("Card exchange returned no response"))
-                  }
-                }
-              }
-
-          iApduReader.exchangeWithCard(currentCardId ?: 0, commands, listener)
-
-          cont.invokeOnCancellation {
-            // NOP
-          }
-        }
-      }
 
   override fun isContactless(): Boolean {
     return true
@@ -306,12 +282,17 @@ internal class ArriveCardReaderAdapter(
 
     override fun onError(data: Bundle) {
       logger.error("Card detection error [errorData={}]", JsonUtil.toJson(data))
-      CoroutineScope(Dispatchers.IO).launch {
-        delay(500)
-        if (isCardDetectionStarted) {
-          onStartDetection()
-        }
-      }
+      Thread {
+            try {
+              Thread.sleep(500)
+              if (isCardDetectionStarted) {
+                onStartDetection()
+              }
+            } catch (_: InterruptedException) {
+              // NOP
+            }
+          }
+          .start()
     }
   }
 }

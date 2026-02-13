@@ -27,7 +27,6 @@ dependencies {
   // End Keyple configuration
   // Kotlin
   implementation("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
   // Logging
   compileOnly("org.slf4j:slf4j-api:1.7.36")
 }

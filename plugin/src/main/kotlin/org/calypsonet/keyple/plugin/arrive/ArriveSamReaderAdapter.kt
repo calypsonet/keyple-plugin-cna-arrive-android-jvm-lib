@@ -11,16 +11,10 @@
  ************************************************************************************** */
 package org.calypsonet.keyple.plugin.arrive
 
-import android.os.RemoteException
 import com.parkeon.periphs.reader.IApduReader
 import com.parkeon.periphs.reader.IApduReaderExchangeListener
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeout
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.calypsonet.keyple.plugin.arrive.ArriveUtils.checkNotOnMainThread
 import org.eclipse.keyple.core.plugin.CardIOException
 import org.eclipse.keyple.core.plugin.spi.reader.ReaderSpi
@@ -85,49 +79,38 @@ internal class ArriveSamReaderAdapter(
 
   override fun transmitApdu(apduIn: ByteArray): ByteArray {
     checkNotOnMainThread()
-    return try {
-      val responses: List<ByteArray> = runBlocking { suspendExchangeWithSam(listOf(apduIn)) }
-      val firstResponse = responses.firstOrNull()
-      if (firstResponse == null || firstResponse.size < 2) {
+    val latch = CountDownLatch(1)
+    var response: ByteArray? = null
+    try {
+      iApduReader.exchangeWithSAM(
+          sam.samId,
+          listOf(apduIn),
+          object : IApduReaderExchangeListener.Stub() {
+            override fun onExchangeDone(id: Long, result: Boolean, responses: List<*>?) {
+              if (result && responses != null && responses.isNotEmpty()) {
+                @Suppress("UNCHECKED_CAST")
+                response = (responses as List<ByteArray>).first()
+              }
+              latch.countDown()
+            }
+          },
+      )
+      if (!latch.await(5, TimeUnit.SECONDS)) {
+        throw CardIOException("SAM exchange timed out")
+      }
+      val r = response
+      if (r == null || r.size < 2) {
         throw IllegalStateException(
-            "SAM exchange returned invalid response [data=${JsonUtil.toJson(firstResponse)}]"
+            "SAM exchange returned invalid response [data=${JsonUtil.toJson(r)}]"
         )
       }
-      firstResponse
-    } catch (_: TimeoutCancellationException) {
-      throw CardIOException("SAM exchange timed out")
-    } catch (e: CancellationException) {
+      return r
+    } catch (e: CardIOException) {
       throw e
     } catch (e: Exception) {
       throw CardIOException("SAM exchange failed", e)
     }
   }
-
-  private suspend fun suspendExchangeWithSam(commands: List<ByteArray>): List<ByteArray> =
-      withTimeout(5_000L) {
-        suspendCancellableCoroutine { cont ->
-          val listener =
-              object : IApduReaderExchangeListener.Stub() {
-
-                override fun onExchangeDone(id: Long, result: Boolean, responses: List<*>?) {
-                  if (!cont.isActive) {
-                    return
-                  }
-                  if (result) {
-                    @Suppress("UNCHECKED_CAST") cont.resume(responses as List<ByteArray>)
-                  } else {
-                    cont.resumeWithException(RemoteException("SAM exchange returned no response"))
-                  }
-                }
-              }
-
-          iApduReader.exchangeWithSAM(sam.samId, commands, listener)
-
-          cont.invokeOnCancellation {
-            // NOP
-          }
-        }
-      }
 
   override fun isContactless(): Boolean {
     return false

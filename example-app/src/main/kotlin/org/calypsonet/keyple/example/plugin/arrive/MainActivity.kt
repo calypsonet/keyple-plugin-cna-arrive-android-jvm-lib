@@ -135,7 +135,7 @@ class MainActivity :
     }
   }
 
-  private suspend fun initTransaction() {
+  private fun initTransaction() {
     try {
       initReaders()
       initSecuritySettings()
@@ -153,7 +153,7 @@ class MainActivity :
     }
   }
 
-  private suspend fun initReaders() {
+  private fun initReaders() {
     Timber.i("Initializing readers")
 
     // register plugin
