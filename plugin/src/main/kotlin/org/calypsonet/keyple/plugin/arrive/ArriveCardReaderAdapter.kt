@@ -22,10 +22,6 @@ import com.parkeon.services.hunt.HuntEventListener
 import com.parkeon.services.hunt.HuntInterface
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.calypsonet.keyple.plugin.arrive.ArriveUtils.checkNotOnMainThread
 import org.eclipse.keyple.core.plugin.CardIOException
 import org.eclipse.keyple.core.plugin.CardInsertionWaiterAsynchronousApi
@@ -140,7 +136,7 @@ internal class ArriveCardReaderAdapter(
             override fun onExchangeDone(id: Long, result: Boolean, responses: List<*>?) {
               if (result && responses != null && responses.isNotEmpty()) {
                 @Suppress("UNCHECKED_CAST")
-                response = (responses as List<ByteArray>).firstOrNull()
+                response = (responses as List<ByteArray>).first()
               }
               latch.countDown()
             }
@@ -286,12 +282,17 @@ internal class ArriveCardReaderAdapter(
 
     override fun onError(data: Bundle) {
       logger.error("Card detection error [errorData={}]", JsonUtil.toJson(data))
-      CoroutineScope(Dispatchers.IO).launch {
-        delay(500)
-        if (isCardDetectionStarted) {
-          onStartDetection()
-        }
-      }
+      Thread {
+            try {
+              Thread.sleep(500)
+              if (isCardDetectionStarted) {
+                onStartDetection()
+              }
+            } catch (_: InterruptedException) {
+              // NOP
+            }
+          }
+          .start()
     }
   }
 }

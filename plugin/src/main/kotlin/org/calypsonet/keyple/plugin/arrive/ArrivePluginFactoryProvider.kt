@@ -21,7 +21,8 @@ import android.content.Context
  * and configured within the context of the Android application.
  *
  * Responsibilities:
- * - Provides coroutine-based initialization for connecting to necessary Arrive services.
+ * - Provides native CountDownLatch-based initialization for connecting to necessary Arrive
+ *   services.
  * - Returns fully configured factory instances capable of creating Arrive plugin components.
  *
  * @since 3.0.0
@@ -35,7 +36,7 @@ object ArrivePluginFactoryProvider {
    * @return An instance of [ArrivePluginFactory] initialized with the provided context.
    * @since 3.0.0
    */
-  suspend fun provideFactory(context: Context): ArrivePluginFactory {
-    return ArrivePluginFactoryAdapter(context).init()
+  fun provideFactory(context: Context): ArrivePluginFactory {
+    return ArrivePluginFactoryAdapter(context)
   }
 }

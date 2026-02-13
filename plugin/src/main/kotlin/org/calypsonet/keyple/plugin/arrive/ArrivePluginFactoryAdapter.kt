@@ -16,10 +16,9 @@ import android.content.Intent
 import com.parkeon.content.BindJoiner
 import com.parkeon.periphs.reader.IApduReader
 import com.parkeon.services.hunt.HuntInterface
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeout
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import org.eclipse.keyple.core.common.CommonApiProperties
 import org.eclipse.keyple.core.plugin.PluginApiProperties
 import org.eclipse.keyple.core.plugin.spi.PluginFactorySpi
@@ -46,8 +45,8 @@ import org.slf4j.LoggerFactory
  * - `iApduReader`: Provides access to the APDU reader for contactless operations.
  *
  * Highlights:
- * - Provides a coroutine-based mechanism to initialize connections using a timeout for graceful
- *   handling of service readiness.
+ * - Provides a native CountDownLatch-based mechanism to initialize connections using a timeout for
+ *   graceful handling of service readiness.
  * - Ensures cleanup and unbinding of services in case of cancellations or errors.
  *
  * @since 3.0.0
@@ -75,13 +74,12 @@ internal class ArrivePluginFactoryAdapter(private val context: Context) :
 
   override fun getPluginApiVersion(): String = PluginApiProperties.VERSION
 
-  internal suspend fun init(): ArrivePluginFactoryAdapter {
+  init {
     logger.info("Binding to Arrive services")
-    bindJoiner = suspendBindJoinerInitialization(context, initIntents())
+    bindJoiner = initBindJoiner(context)
     huntInterface = HuntInterface.Stub.asInterface(bindJoiner!!.getService(HUNT_INTENT_NAME))
     iApduReader = IApduReader.Stub.asInterface(bindJoiner!!.getService(APDU_INTENT_NAME))
     logger.info("Arrive services bounded")
-    return this
   }
 
   private fun initIntents(): MutableMap<String, Intent> {
@@ -97,51 +95,49 @@ internal class ArrivePluginFactoryAdapter(private val context: Context) :
     return intents
   }
 
-  private suspend fun suspendBindJoinerInitialization(
+  private fun initBindJoiner(
       context: Context,
-      intents: Map<String, Intent>,
-  ): BindJoiner =
-      withTimeout(5_000L) {
-        suspendCancellableCoroutine { cont ->
-          lateinit var bindJoiner: BindJoiner
+  ): BindJoiner {
 
-          val listener =
-              object : BindJoiner.Listener {
+    val latch = CountDownLatch(1)
+    val bindingCompleted = AtomicBoolean(false)
 
-                override fun onJoined(initDone: Boolean) {
-                  if (!cont.isActive) {
-                    logger.error("Arrive services connection established but coroutine cancelled")
-                    return
-                  }
-                  if (initDone) {
-                    logger.info("Arrive services connection established")
-                    cont.resume(bindJoiner)
-                  } else {
-                    logger.error("Arrive services connection established but init not done")
-                    cont.resumeWithException(
-                        IllegalStateException("BindJoiner joined but init not done")
-                    )
-                  }
-                }
+    val intents = initIntents()
 
-                override fun onBindLost(intent: Intent) {
-                  if (!cont.isActive) {
-                    logger.error("Arrive services connection lost and coroutine cancelled")
-                    return
-                  }
-                  logger.error("Arrive services connection lost")
-                  cont.resumeWithException(IllegalStateException("Bind lost for intent $intent"))
-                }
-              }
+    val listener =
+        object : BindJoiner.Listener {
 
-          logger.info("Waiting at most 5 seconds for Arrive services connection...")
-          bindJoiner = BindJoiner(context, intents, listener)
-          bindJoiner.bind()
+          override fun onJoined(initDone: Boolean) {
+            if (initDone) {
+              logger.info("Arrive services binding established")
+              bindingCompleted.set(true)
+            } else {
+              logger.error("Arrive services binding established but init not done")
+            }
+            latch.countDown()
+          }
 
-          cont.invokeOnCancellation {
-            logger.error("Unbinding from Arrive services on cancellation")
-            bindJoiner.unbind()
+          override fun onBindLost(intent: Intent) {
+            logger.error("Arrive services binding lost [intent={}]", intent)
           }
         }
+
+    val bindJoiner = BindJoiner(context, intents, listener)
+
+    logger.info("Waiting at most 5 seconds for Arrive services binding...")
+    bindJoiner.bind()
+
+    try {
+      if (!latch.await(5, TimeUnit.SECONDS)) {
+        throw IllegalStateException("Arrive services binding timed out")
       }
+    } finally {
+      if (!bindingCompleted.get()) {
+        logger.error("Arrive services binding not completed. Trying to unbind...")
+        bindJoiner.unbind()
+      }
+    }
+
+    return bindJoiner
+  }
 }

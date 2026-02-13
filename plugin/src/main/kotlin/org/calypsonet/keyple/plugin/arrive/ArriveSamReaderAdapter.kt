@@ -89,7 +89,7 @@ internal class ArriveSamReaderAdapter(
             override fun onExchangeDone(id: Long, result: Boolean, responses: List<*>?) {
               if (result && responses != null && responses.isNotEmpty()) {
                 @Suppress("UNCHECKED_CAST")
-                response = (responses as List<ByteArray>).firstOrNull()
+                response = (responses as List<ByteArray>).first()
               }
               latch.countDown()
             }
