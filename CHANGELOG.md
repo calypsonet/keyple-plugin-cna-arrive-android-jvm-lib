@@ -5,12 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Complete migration of the plugin from Flowbird to Arrive:
+  - Renamed module `flowbird-plugin` to `plugin`
+  - Renamed module `flowbird-plugin-mock` to `plugin-mock`
+  - All public APIs migrated to the `arrive` namespace
+- Optimized APDU exchange performance for dual-core hardware by replacing coroutines with native
+  synchronization.
+### Upgraded
+- "Keyple Common Java API" from version `2.0.0` to `2.0.2`
+- "Keyple Plugin Java API" from version `2.0.0` to `2.3.2`
+- "Keyple Util Java Library" from version `2.1.0` to `2.4.1`
 ### CI
 - Upgrade from JDK 8 to JDK 11 to fix the problem encountered by Spotless when formatting Kotlin.
 - Automation of the right to execute (x) shell scripts.
 ### Upgraded examples
-- "Keyple Service Library" to version `2.1.0`
-- "Keyple Service Resource Library" to version `2.0.2`
+- "Keyple Java BOM" to version `2026.02.20`
 
 ## [2.0.1] - 2022-06-10
 ### Added
