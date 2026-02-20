@@ -57,7 +57,7 @@ internal class ArriveSamReaderAdapter(
   override fun openPhysicalChannel() {
     isPhysicalChannelOpen = true
     if (logger.isDebugEnabled) {
-      logger.debug("SAM channel opened [sam=[{}], atr={}]", sam.readerName, samAtrHex)
+      logger.debug("SAM channel opened [sam={}, atr={}]", sam.readerName, samAtrHex)
     }
   }
 
@@ -101,7 +101,7 @@ internal class ArriveSamReaderAdapter(
       val r = response
       if (r == null || r.size < 2) {
         throw IllegalStateException(
-            "SAM exchange returned invalid response [data=${JsonUtil.toJson(r)}]"
+            "SAM exchange returned an invalid response. Data: ${JsonUtil.toJson(r)}"
         )
       }
       return r
