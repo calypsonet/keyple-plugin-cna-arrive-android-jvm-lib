@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrade from JDK 8 to JDK 11 to fix the problem encountered by Spotless when formatting Kotlin.
 - Automation of the right to execute (x) shell scripts.
 ### Upgraded examples
-- "Keyple Java BOM" to version `2026.02.20`
+- "Keyple Java BOM" to version `2026.03.19`
 
 ## [2.0.1] - 2022-06-10
 ### Added
