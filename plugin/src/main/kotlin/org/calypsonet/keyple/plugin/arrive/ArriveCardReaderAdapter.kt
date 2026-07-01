@@ -148,7 +148,7 @@ internal class ArriveCardReaderAdapter(
       val r = response
       if (r == null || r.size < 2) {
         throw IllegalStateException(
-            "Card exchange returned invalid response [data=${JsonUtil.toJson(r)}]"
+            "Card exchange returned an invalid response. Data: ${JsonUtil.toJson(r)}"
         )
       }
       return r

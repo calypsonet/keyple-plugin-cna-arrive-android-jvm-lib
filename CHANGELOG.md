@@ -5,12 +5,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.0.0] - 2026-07-01
+### Changed
+- Complete migration of the plugin from Flowbird to Arrive:
+  - Renamed module `flowbird-plugin` to `plugin`
+  - Renamed module `flowbird-plugin-mock` to `plugin-mock`
+  - All public APIs migrated to the `arrive` namespace
+- Optimized APDU exchange performance for dual-core hardware by replacing coroutines with native
+  synchronization.
+### Upgraded
+- "Keyple Common Java API" from version `2.0.0` to `2.0.2`
+- "Keyple Plugin Java API" from version `2.0.0` to `2.3.2`
+- "Keyple Util Java Library" from version `2.1.0` to `2.4.1`
 ### CI
 - Upgrade from JDK 8 to JDK 11 to fix the problem encountered by Spotless when formatting Kotlin.
 - Automation of the right to execute (x) shell scripts.
 ### Upgraded examples
-- "Keyple Service Library" to version `2.1.0`
-- "Keyple Service Resource Library" to version `2.0.2`
+- "Keyple Java BOM" to version `2026.03.19`
 
 ## [2.0.1] - 2022-06-10
 ### Added
@@ -32,7 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2021-01-29
 This is the initial release.
 
-[unreleased]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/compare/2.0.1...HEAD
+[unreleased]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/compare/3.0.0...HEAD
+[3.0.0]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/compare/2.0.1...3.0.0
 [2.0.1]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/compare/1.1.0...2.0.0
 [1.1.0]: https://github.com/calypsonet/keyple-plugin-cna-arrive-android-jvm-lib/releases/tag/1.1.0

@@ -1,4 +1,4 @@
-# Contributing to "Keyple Plugin CNA Arrive Android Java Lib" implementation
+# Contributing to "Keyple Plugin CNA Arrive Android Jvm Lib"
 
 Thanks for your interest in this project.
 
